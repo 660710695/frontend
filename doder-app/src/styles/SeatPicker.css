@@ -1,0 +1,5 @@
+.seat-row { display:flex; gap:6px; margin:6px 0; justify-content:center; }
+.seat { width:36px; height:36px; border-radius:6px; border:1px solid #ddd; background:#f7f7f7; cursor:pointer; }
+.seat.available:hover { transform: translateY(-3px); }
+.seat.booked { background:#bbb; cursor:not-allowed; }
+.seat.selected { background:#0077ff; color:white; }
