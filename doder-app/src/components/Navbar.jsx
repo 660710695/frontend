@@ -1,12 +1,15 @@
 import { Link } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa";
 import "../styles/Navbar.css";
+import LogoIcon from "../images/DoderLogo.png";
 
 function Navbar() {
   return (
     <nav className="nav">
       <div className="left">
-        <div className="logo"><Link to="/">MyProject</Link></div>
+        <div className="logo">
+          <img src={LogoIcon} alt="ticket" />
+        </div>
         <ul className="menu">
           <li><Link to="/">หน้าหลัก</Link></li>
           <li><Link to="/movies">ภาพยนตร์</Link></li>

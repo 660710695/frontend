@@ -1,5 +1,44 @@
-.seat-row { display:flex; gap:6px; margin:6px 0; justify-content:center; }
-.seat { width:36px; height:36px; border-radius:6px; border:1px solid #ddd; background:#f7f7f7; cursor:pointer; }
-.seat.available:hover { transform: translateY(-3px); }
-.seat.booked { background:#bbb; cursor:not-allowed; }
-.seat.selected { background:#0077ff; color:white; }
+.seat-page {
+  padding: 20px;
+  text-align: center;
+}
+
+.screen {
+  background: #ddd;
+  padding: 10px;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+.seats-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 40px);
+  gap: 10px;
+  justify-content: center;
+}
+
+.seat {
+  width: 40px;
+  height: 40px;
+  background: #eee;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.seat.selected {
+  background: #4caf50;
+  color: white;
+}
+
+.confirm-btn {
+  margin-top: 20px;
+  padding: 12px 20px;
+  border: none;
+  background: #007bff;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+}

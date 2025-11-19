@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import "../styles/Cinema.css";
 
 // Example data
@@ -27,6 +27,7 @@ const cinemas = [
 function Cinema() {
   const query = new URLSearchParams(useLocation().search);
   const movieId = Number(query.get("movie"));
+  const navigate = useNavigate();
 
   const availableCinemas = cinemas.filter(c => c.movies.includes(movieId));
 
@@ -71,7 +72,16 @@ function Cinema() {
           <h2>เลือกรอบฉาย</h2>
           <div className="time-list">
             {selectedCinema.showtimes[selectedDate].map(time => (
-              <button key={time}>{time}</button>
+              <button
+                key={time}
+                className="time-btn"
+                onClick={() =>
+                  navigate(
+                    `/seats?movie=${movieId}&cinema=${selectedCinema.id}&date=${selectedDate}&time=${time}`
+                  )}>
+                {time}
+              </button>
+
             ))}
           </div>
         </>

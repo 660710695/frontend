@@ -1,61 +1,71 @@
-import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import "../styles/SeatPicker.css";
-import axios from "axios";
 
-export default function SeatPicker({ showtimeId, onChange }) {
-  // seatMap: array of rows, each row array of { id, label, status } status: "available"|"booked"
-  const [seatMap, setSeatMap] = useState([]);
-  const [selected, setSelected] = useState([]);
-  const [loading, setLoading] = useState(true);
+function SeatPicker() {
+  const query = new URLSearchParams(useLocation().search);
+  const movieId = query.get("movie");
+  const cinemaId = query.get("cinema");
+  const date = query.get("date");
+  const time = query.get("time");
 
-  useEffect(() => {
-    async function load() {
-      setLoading(true);
-      const res = await axios.get(`/api/showtimes/${showtimeId}/seats`);
-      setSeatMap(res.data.seatMap);
-      setLoading(false);
-    }
-    load();
-  }, [showtimeId]);
+  const rows = ["A", "B", "C", "D", "E"];
+  const cols = 8;
 
-  function toggleSeat(seat) {
-    if (seat.status === "booked") return;
-    if (selected.includes(seat.id)) {
-      setSelected(s => s.filter(x => x !== seat.id));
-      onChange?.(selected.filter(x => x !== seat.id));
-    } else {
-      setSelected(s => {
-        const next = [...s, seat.id];
-        onChange?.(next);
-        return next;
-      });
-    }
-  }
+  const [selectedSeats, setSelectedSeats] = useState([]);
+  const navigate = useNavigate();
 
-  if (loading) return <div>Loading seats…</div>;
+  const toggleSeat = (seat) => {
+    setSelectedSeats((prev) =>
+      prev.includes(seat)
+        ? prev.filter((s) => s !== seat)
+        : [...prev, seat]
+    );
+  };
 
   return (
-    <div className="seatpicker">
-      {seatMap.map((row, rowIdx) => (
-        <div key={rowIdx} className="seat-row">
-          {row.map(seat => {
-            const isSelected = selected.includes(seat.id);
-            const className = `seat ${seat.status} ${isSelected ? "selected" : ""}`;
+    <div className="seat-page">
+      <h1>เลือกที่นั่ง</h1>
+
+      <p>หนัง: {movieId}</p>
+      <p>โรง: {cinemaId}</p>
+      <p>วันที่: {date}</p>
+      <p>รอบ: {time}</p>
+
+      <div className="screen">SCREEN</div>
+
+      <div className="seats-grid">
+        {rows.map((r) =>
+          Array.from({ length: cols }).map((_, i) => {
+            const seat = `${r}${i + 1}`;
+            const isSelected = selectedSeats.includes(seat);
+
             return (
-              <button
-                key={seat.id}
-                className={className}
+              <div
+                key={seat}
+                className={`seat ${isSelected ? "selected" : ""}`}
                 onClick={() => toggleSeat(seat)}
-                aria-pressed={isSelected}
-                aria-label={`Seat ${seat.label} ${seat.status}`}
-                disabled={seat.status === "booked"}
               >
-                {seat.label}
-              </button>
+                {seat}
+              </div>
             );
-          })}
-        </div>
-      ))}
+          })
+        )}
+      </div>
+
+      <button
+        className="confirm-btn"
+        onClick={() =>
+          navigate(
+            `/checkout?movie=${movieId}&cinema=${cinemaId}&date=${date}&time=${time}&seats=${selectedSeats.join(",")}`
+          )
+        }
+      >
+        ยืนยันที่นั่ง ({selectedSeats.length})
+      </button>
+
     </div>
   );
 }
+
+export default SeatPicker;
