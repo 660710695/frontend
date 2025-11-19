@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import './MovieCard.css'; // เพิ่ม css เฉยๆ ถ้าจะแก้หรือไม่ใช้ก็แก้หรือลบทิ้งได้เลยนะ
 
 export default function MovieCard({ movie }) {
   return (
