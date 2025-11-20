@@ -1,9 +1,0 @@
-.movies-grid {
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(auto-fill, minmax(160px,1fr));
-  padding: 1rem;
-}
-.movie-card { text-decoration:none; color:inherit; display:block; border-radius:8px; overflow:hidden; background:#fff; box-shadow:0 6px 18px rgba(0,0,0,0.06); }
-.movie-card img { width:100%; display:block; height:240px; object-fit:cover; }
-.meta { padding:0.6rem; }
