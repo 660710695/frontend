@@ -1,0 +1,75 @@
+.not-found-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to bottom right, #d1fae5, #e0e7ff); /* viridian-100 to purple-100 */
+  padding: 0 1rem;
+}
+
+.not-found-content {
+  text-align: center;
+}
+
+.not-found-title {
+  font-size: 6rem; /* Adjusted for larger screens */
+  font-weight: bold;
+  color: #065f46; /* viridian-600 */
+  margin-bottom: 1rem;
+}
+
+.not-found-message {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #1f2937; /* gray-800 */
+  margin-bottom: 1rem;
+}
+
+.not-found-description {
+  color: #4b5563; /* gray-600 */
+  margin-bottom: 2rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.not-found-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.not-found-button {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s;
+}
+
+.home-button {
+  background-color: #065f46; /* viridian-600 */
+  color: white;
+}
+
+.home-button:hover {
+  background-color: #0e6b62; /* viridian-700 */
+}
+
+.books-button {
+  background-color: white;
+  color: #065f46; /* viridian-600 */
+  border: 2px solid #065f46; /* viridian-600 */
+}
+
+.books-button:hover {
+  background-color: #f0fdf4; /* viridian-50 */
+}
+
+.icon {
+  height: 1.25rem;
+  width: 1.25rem;
+  margin-right: 0.5rem;
+}
