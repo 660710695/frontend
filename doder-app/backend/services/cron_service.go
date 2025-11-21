@@ -142,7 +142,7 @@ func (s *CronService) CancelExpiredReservations() {
 	if cancelledCount > 0 {
 		log.Printf("Auto-cancelled %d expired reservation(s)", cancelledCount)
 	} else {
-		log.Printf("✓ No expired reservations found")
+		log.Printf("No expired reservations found")
 	}
 }
 
