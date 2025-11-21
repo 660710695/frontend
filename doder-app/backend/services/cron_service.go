@@ -41,12 +41,12 @@ func (s *CronService) runAutoCancelExpiredReservations() {
 // CancelExpiredReservations ยกเลิกการจองที่หมดเวลา (Public - เรียกได้จาก handler)
 func (s *CronService) CancelExpiredReservations() {
 	now := time.Now()
-	log.Printf("⏰ Running auto-cancel expired reservations at %s", now.Format("2006-01-02 15:04:05"))
+	log.Printf("Running auto-cancel expired reservations at %s", now.Format("2006-01-02 15:04:05"))
 
 	// เริ่ม transaction
 	tx, err := s.db.Begin()
 	if err != nil {
-		log.Printf("❌ Failed to start transaction: %v", err)
+		log.Printf("Failed to start transaction: %v", err)
 		return
 	}
 	defer tx.Rollback()
@@ -65,7 +65,7 @@ func (s *CronService) CancelExpiredReservations() {
 
 	rows, err := tx.Query(query, now)
 	if err != nil {
-		log.Printf("❌ Failed to query expired reservations: %v", err)
+		log.Printf("Failed to query expired reservations: %v", err)
 		return
 	}
 	defer rows.Close()
@@ -80,7 +80,7 @@ func (s *CronService) CancelExpiredReservations() {
 	for rows.Next() {
 		var bookingID, showtimeID, seatCount int
 		if err := rows.Scan(&bookingID, &showtimeID, &seatCount); err != nil {
-			log.Printf("❌ Failed to scan row: %v", err)
+			log.Printf("Failed to scan row: %v", err)
 			continue
 		}
 		expiredBookings = append(expiredBookings, struct {
@@ -101,7 +101,7 @@ func (s *CronService) CancelExpiredReservations() {
 		`, expired.bookingID)
 
 		if err != nil {
-			log.Printf("❌ Failed to cancel booking %d: %v", expired.bookingID, err)
+			log.Printf("Failed to cancel booking %d: %v", expired.bookingID, err)
 			continue
 		}
 
@@ -112,7 +112,7 @@ func (s *CronService) CancelExpiredReservations() {
 		`, expired.bookingID, expired.showtimeID)
 
 		if err != nil {
-			log.Printf("❌ Failed to release seats for booking %d: %v", expired.bookingID, err)
+			log.Printf("Failed to release seats for booking %d: %v", expired.bookingID, err)
 			continue
 		}
 
@@ -124,23 +124,23 @@ func (s *CronService) CancelExpiredReservations() {
 		`, expired.seatCount, expired.showtimeID)
 
 		if err != nil {
-			log.Printf("❌ Failed to update available seats for showtime %d: %v", expired.showtimeID, err)
+			log.Printf("Failed to update available seats for showtime %d: %v", expired.showtimeID, err)
 			continue
 		}
 
 		cancelledCount++
-		log.Printf("✅ Cancelled expired booking %d (showtime: %d, seats: %d)",
+		log.Printf("Cancelled expired booking %d (showtime: %d, seats: %d)",
 			expired.bookingID, expired.showtimeID, expired.seatCount)
 	}
 
 	// Commit transaction
 	if err := tx.Commit(); err != nil {
-		log.Printf("❌ Failed to commit transaction: %v", err)
+		log.Printf("Failed to commit transaction: %v", err)
 		return
 	}
 
 	if cancelledCount > 0 {
-		log.Printf("✅ Auto-cancelled %d expired reservation(s)", cancelledCount)
+		log.Printf("Auto-cancelled %d expired reservation(s)", cancelledCount)
 	} else {
 		log.Printf("✓ No expired reservations found")
 	}
@@ -158,13 +158,13 @@ func (s *CronService) CleanOldCancelledBookings() {
 	`, cutoffDate)
 
 	if err != nil {
-		log.Printf("❌ Failed to clean old cancelled bookings: %v", err)
+		log.Printf("Failed to clean old cancelled bookings: %v", err)
 		return
 	}
 
 	rowsAffected, _ := result.RowsAffected()
 	if rowsAffected > 0 {
-		log.Printf("✅ Cleaned %d old cancelled booking(s)", rowsAffected)
+		log.Printf("Cleaned %d old cancelled booking(s)", rowsAffected)
 	}
 }
 
