@@ -5,6 +5,8 @@ import (
 	"os"
 
 	"movie-booking-system/config"
+	"movie-booking-system/routes"
+	"movie-booking-system/services"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -13,7 +15,7 @@ import (
 func main() {
 	// โหลด .env file
 	if err := godotenv.Load(); err != nil {
-		log.Println("⚠️  No .env file found, using environment variables")
+		log.Println("No .env file found")
 	}
 
 	// เชื่อมต่อ database
@@ -44,6 +46,15 @@ func main() {
 			"status":  "healthy",
 		})
 	})
+
+	//Setup routes
+	db := config.GetDB()
+
+	//Cron Jobs (Auto-cancel expired reservations)
+	cronService := services.NewCronService(db)
+	cronService.StartCronJobs()
+
+	routes.SetupRoutes(r, db, cronService)
 
 	// Start serevr
 	port := os.Getenv("PORT")

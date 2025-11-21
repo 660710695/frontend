@@ -34,8 +34,15 @@ func ConnectDB() {
 	log.Println("Connected to PostgreSQL database successfully!")
 }
 
+// GetDB คืนค่า database
+func GetDB() *sql.DB {
+	return DB
+}
+
+// CloseDB ปิดการเชื่อมต่อ database
 func CloseDB() {
 	if DB != nil {
 		DB.Close()
+		log.Println("Database connection closed")
 	}
 }

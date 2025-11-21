@@ -115,14 +115,3 @@ CREATE TABLE seat_status (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(showtime_id, seat_id)
 );
-
--- 10. ตาราง Admin_Logs (บันทึกการทำงานของ Admin)
-CREATE TABLE admin_logs (
-    log_id SERIAL PRIMARY KEY,
-    admin_id INTEGER NOT NULL REFERENCES users(user_id),
-    action VARCHAR(50) NOT NULL,
-    table_name VARCHAR(50) NOT NULL,
-    record_id INTEGER,
-    description TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
