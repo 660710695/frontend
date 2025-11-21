@@ -1,11 +1,10 @@
 -- ===================================
--- Movie Ticket Booking System - Simple Schema
+-- Movie Ticket Booking System
 -- ===================================
 
 -- 1. ตาราง Users (ผู้ใช้งาน)
 CREATE TABLE users (
     user_id SERIAL PRIMARY KEY,
-    email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
@@ -21,8 +20,6 @@ CREATE TABLE cinemas (
     cinema_name VARCHAR(255) NOT NULL,
     address TEXT NOT NULL,
     city VARCHAR(100) NOT NULL,
-    phone VARCHAR(20),
-    email VARCHAR(255),
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -56,17 +53,11 @@ CREATE TABLE seats (
 CREATE TABLE movies (
     movie_id SERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
-    title_en VARCHAR(255),
     description TEXT,
     duration INTEGER NOT NULL,
-    genre VARCHAR(100),
-    rating VARCHAR(10),
     language VARCHAR(50),
     subtitle VARCHAR(50),
-    director VARCHAR(255),
-    actors TEXT,
     poster_url TEXT,
-    trailer_url TEXT,
     release_date DATE,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -97,7 +88,6 @@ CREATE TABLE bookings (
     total_amount DECIMAL(10, 2) NOT NULL,
     booking_status VARCHAR(20) NOT NULL DEFAULT 'pending',
     payment_status VARCHAR(20) NOT NULL DEFAULT 'pending',
-    payment_method VARCHAR(50),
     booking_code VARCHAR(50) UNIQUE NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
