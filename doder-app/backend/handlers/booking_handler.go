@@ -1,0 +1,391 @@
+package handlers
+
+import (
+	"database/sql"
+	"fmt"
+	"net/http"
+	"strconv"
+	"time"
+
+	"movie-booking-system/models"
+
+	"github.com/gin-gonic/gin"
+)
+
+type BookingHandler struct {
+	db *sql.DB
+}
+
+func NewBookingHandler(db *sql.DB) *BookingHandler {
+	return &BookingHandler{db: db}
+}
+
+// CreateBooking สร้างการจองตั๋วใหม่
+// POST /api/bookings
+func (h *BookingHandler) CreateBooking(c *gin.Context) {
+	var req models.CreateBookingRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Success: false,
+			Error:   err.Error(),
+		})
+		return
+	}
+
+	// ตรวจสอบ showtime
+	var price float64
+	var availableSeats int
+	query := "SELECT price, available_seats FROM showtimes WHERE showtime_id = $1 AND is_active = TRUE"
+	err := h.db.QueryRow(query, req.ShowtimeID).Scan(&price, &availableSeats)
+	if err == sql.ErrNoRows {
+		c.JSON(http.StatusNotFound, models.ErrorResponse{
+			Success: false,
+			Error:   "Showtime not found",
+		})
+		return
+	}
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Success: false,
+			Error:   "Failed to fetch showtime",
+		})
+		return
+	}
+
+	// ตรวจสอบจำนวนที่นั่งว่างพอหรือไม่
+	if len(req.SeatIDs) > availableSeats {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Success: false,
+			Error:   "Not enough available seats",
+		})
+		return
+	}
+
+	// สร้าง booking code
+	bookingCode := fmt.Sprintf("BK%d%d", 1, time.Now().Unix())
+
+	// เริ่มต้น transaction
+	tx, err := h.db.Begin()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Success: false,
+			Error:   "Failed to start transaction",
+		})
+		return
+	}
+	defer tx.Rollback()
+
+	// สร้าง booking
+	totalAmount := price * float64(len(req.SeatIDs))
+	var bookingID int
+	bookingQuery := `
+		INSERT INTO bookings (user_id, showtime_id, total_amount, booking_code, booking_status, payment_status)
+		VALUES ($1, $2, $3, $4, 'pending', 'pending')
+		RETURNING booking_id
+	`
+	err = tx.QueryRow(bookingQuery, 1, req.ShowtimeID, totalAmount, bookingCode).Scan(&bookingID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Success: false,
+			Error:   "Failed to create booking",
+		})
+		return
+	}
+
+	// เพิ่ม booking seats
+	for _, seatID := range req.SeatIDs {
+		// ตรวจสอบว่าที่นั่งว่างหรือไม่
+		var status string
+		seatStatusQuery := "SELECT status FROM seat_status WHERE showtime_id = $1 AND seat_id = $2"
+		err := tx.QueryRow(seatStatusQuery, req.ShowtimeID, seatID).Scan(&status)
+		if err == nil && status != "available" {
+			c.JSON(http.StatusBadRequest, models.ErrorResponse{
+				Success: false,
+				Error:   fmt.Sprintf("Seat %d is not available", seatID),
+			})
+			return
+		}
+
+		// เพิ่ม booking seat
+		bookingSeatQuery := `
+			INSERT INTO booking_seats (booking_id, seat_id, price)
+			VALUES ($1, $2, $3)
+		`
+		_, err = tx.Exec(bookingSeatQuery, bookingID, seatID, price)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+				Success: false,
+				Error:   "Failed to add seat to booking",
+			})
+			return
+		}
+
+		// อัปเดต seat status เป็น reserved
+		updateSeatStatusQuery := `
+			UPDATE seat_status 
+			SET status = 'reserved', booking_id = $1, reserved_until = $2
+			WHERE showtime_id = $3 AND seat_id = $4
+		`
+		_, err = tx.Exec(updateSeatStatusQuery, bookingID, time.Now().Add(15*time.Minute), req.ShowtimeID, seatID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+				Success: false,
+				Error:   "Failed to update seat status",
+			})
+			return
+		}
+	}
+
+	// ลดจำนวน available seats
+	updateShowtimeQuery := "UPDATE showtimes SET available_seats = available_seats - $1 WHERE showtime_id = $2"
+	_, err = tx.Exec(updateShowtimeQuery, len(req.SeatIDs), req.ShowtimeID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Success: false,
+			Error:   "Failed to update available seats",
+		})
+		return
+	}
+
+	// Commit transaction
+	if err := tx.Commit(); err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Success: false,
+			Error:   "Failed to commit transaction",
+		})
+		return
+	}
+
+	c.JSON(http.StatusCreated, models.Response{
+		Success: true,
+		Message: "Booking created successfully",
+		Data: gin.H{
+			"booking_id":   bookingID,
+			"booking_code": bookingCode,
+			"total_amount": totalAmount,
+		},
+	})
+}
+
+// GetBooking ดึงข้อมูลการจองตาม ID
+// GET /api/bookings/:id
+func (h *BookingHandler) GetBooking(c *gin.Context) {
+	bookingID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Success: false,
+			Error:   "Invalid booking ID",
+		})
+		return
+	}
+
+	query := `
+		SELECT 
+			b.booking_id, b.booking_code, b.user_id, b.showtime_id,
+			m.title, c.cinema_name, t.theater_name, 
+			s.show_date, s.show_time, 
+			b.total_amount, b.booking_status, b.payment_status, b.booking_date
+		FROM bookings b
+		JOIN showtimes s ON b.showtime_id = s.showtime_id
+		JOIN movies m ON s.movie_id = m.movie_id
+		JOIN theaters t ON s.theater_id = t.theater_id
+		JOIN cinemas c ON t.cinema_id = c.cinema_id
+		WHERE b.booking_id = $1
+	`
+
+	var booking models.Booking
+	err = h.db.QueryRow(query, bookingID).Scan(
+		&booking.BookingID, &booking.BookingCode, &booking.UserID, &booking.ShowtimeID,
+		&booking.TotalAmount, &booking.BookingStatus, &booking.PaymentStatus, &booking.BookingDate,
+	)
+
+	if err == sql.ErrNoRows {
+		c.JSON(http.StatusNotFound, models.ErrorResponse{
+			Success: false,
+			Error:   "Booking not found",
+		})
+		return
+	}
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Success: false,
+			Error:   "Failed to fetch booking",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, models.Response{
+		Success: true,
+		Data:    booking,
+	})
+}
+
+// CancelBooking ยกเลิกการจอง
+// DELETE /api/bookings/:id
+func (h *BookingHandler) CancelBooking(c *gin.Context) {
+	bookingID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Success: false,
+			Error:   "Invalid booking ID",
+		})
+		return
+	}
+
+	// ตรวจสอบ status ว่าสามารถยกเลิกได้หรือไม่
+	var bookingStatus string
+	query := "SELECT booking_status FROM bookings WHERE booking_id = $1"
+	err = h.db.QueryRow(query, bookingID).Scan(&bookingStatus)
+	if err == sql.ErrNoRows {
+		c.JSON(http.StatusNotFound, models.ErrorResponse{
+			Success: false,
+			Error:   "Booking not found",
+		})
+		return
+	}
+
+	if bookingStatus == "cancelled" || bookingStatus == "confirmed" {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Success: false,
+			Error:   "Cannot cancel this booking",
+		})
+		return
+	}
+
+	// เริ่มต้น transaction
+	tx, err := h.db.Begin()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Success: false,
+			Error:   "Failed to start transaction",
+		})
+		return
+	}
+	defer tx.Rollback()
+
+	// อัปเดต booking status
+	updateQuery := "UPDATE bookings SET booking_status = 'cancelled', updated_at = CURRENT_TIMESTAMP WHERE booking_id = $1"
+	_, err = tx.Exec(updateQuery, bookingID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Success: false,
+			Error:   "Failed to cancel booking",
+		})
+		return
+	}
+
+	// ดึงข้อมูลที่นั่งและ showtime
+	seatsQuery := `
+		SELECT bs.seat_id, b.showtime_id FROM booking_seats bs
+		JOIN bookings b ON bs.booking_id = b.booking_id
+		WHERE bs.booking_id = $1
+	`
+	rows, err := tx.Query(seatsQuery, bookingID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Success: false,
+			Error:   "Failed to fetch seats",
+		})
+		return
+	}
+	defer rows.Close()
+
+	var showtimeID int
+	var seatCount int
+	seats := []int{}
+	for rows.Next() {
+		var seatID int
+		rows.Scan(&seatID, &showtimeID)
+		seats = append(seats, seatID)
+		seatCount++
+	}
+
+	// อัปเดต seat status กลับเป็น available
+	for _, seatID := range seats {
+		updateSeatQuery := `
+			UPDATE seat_status 
+			SET status = 'available', booking_id = NULL, reserved_until = NULL
+			WHERE showtime_id = $1 AND seat_id = $2
+		`
+		_, err = tx.Exec(updateSeatQuery, showtimeID, seatID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+				Success: false,
+				Error:   "Failed to update seat status",
+			})
+			return
+		}
+	}
+
+	// เพิ่มจำนวน available seats กลับ
+	updateShowtimeQuery := "UPDATE showtimes SET available_seats = available_seats + $1 WHERE showtime_id = $2"
+	_, err = tx.Exec(updateShowtimeQuery, seatCount, showtimeID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Success: false,
+			Error:   "Failed to update available seats",
+		})
+		return
+	}
+
+	// Commit transaction
+	if err := tx.Commit(); err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Success: false,
+			Error:   "Failed to commit transaction",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, models.Response{
+		Success: true,
+		Message: "Booking cancelled successfully",
+	})
+}
+
+// GetAllBookings (Admin) ดึงข้อมูลการจองทั้งหมด
+// GET /api/admin/bookings
+func (h *BookingHandler) GetAllBookings(c *gin.Context) {
+	query := `
+		SELECT 
+			b.booking_id, b.booking_code, b.user_id, b.showtime_id,
+			m.title, c.cinema_name, t.theater_name, 
+			s.show_date, s.show_time, 
+			b.total_amount, b.booking_status, b.payment_status, b.booking_date
+		FROM bookings b
+		JOIN showtimes s ON b.showtime_id = s.showtime_id
+		JOIN movies m ON s.movie_id = m.movie_id
+		JOIN theaters t ON s.theater_id = t.theater_id
+		JOIN cinemas c ON t.cinema_id = c.cinema_id
+		ORDER BY b.booking_date DESC
+	`
+
+	rows, err := h.db.Query(query)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Success: false,
+			Error:   "Failed to fetch bookings",
+		})
+		return
+	}
+	defer rows.Close()
+
+	bookings := []models.Booking{}
+	for rows.Next() {
+		var booking models.Booking
+		err := rows.Scan(
+			&booking.BookingID, &booking.BookingCode, &booking.UserID, &booking.ShowtimeID,
+			&booking.TotalAmount, &booking.BookingStatus, &booking.PaymentStatus, &booking.BookingDate,
+		)
+		if err != nil {
+			continue
+		}
+		bookings = append(bookings, booking)
+	}
+
+	c.JSON(http.StatusOK, models.Response{
+		Success: true,
+		Data:    bookings,
+	})
+}
