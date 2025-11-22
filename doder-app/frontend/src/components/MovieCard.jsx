@@ -1,13 +1,18 @@
+// ใน MovieCard.jsx
+
 import { Link } from "react-router-dom";
-import '../styles/MovieCard.css'; // เพิ่ม css เฉยๆ ถ้าจะแก้หรือไม่ใช้ก็แก้หรือลบทิ้งได้เลยนะ
+import '../styles/MovieCard.css'; 
 
 export default function MovieCard({ movie }) {
   return (
-    <Link to={`/movies/${movie.id}`} className="movie-card">
-      <img src={movie.poster} alt={movie.title} />
+    // *** แก้ไข 1: ใช้ movie.movie_id สำหรับ Link ***
+    <Link to={`/movies/${movie.movie_id}`} className="movie-card">
+      {/* *** แก้ไข 2: ใช้ movie.poster_url สำหรับรูปภาพ *** */}
+      <img src={movie.poster_url} alt={movie.title} />
       <div className="meta">
         <h3>{movie.title}</h3>
-        <p>{movie.year}</p>
+        {/* *** แก้ไข 3: ใช้ movie.release_date สำหรับปี และตัดเหลือ 4 ตัวแรก *** */}
+        <p>{movie.release_date ? movie.release_date.substring(0, 4) : 'N/A'}</p>
       </div>
     </Link>
   );
