@@ -1,6 +1,7 @@
 import React from "react";
 import MovieCard from './MovieCard';
-import './FeaturedMovies.css';
+// import './FeaturedMovies.css';
+import '../styles/FeaturedMovies.css';
 import { movies } from '../data/movies'; // นำเข้าข้อมูลจาก movies.js
 
 export default function FeaturedMovies() {
