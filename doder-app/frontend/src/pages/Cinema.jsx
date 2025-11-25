@@ -1,12 +1,8 @@
-// ใน Cinema.jsx
-
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../styles/Cinema.css";
 
 const API_BASE_URL = "http://localhost:8081/api";
-
-// ------------------- HELPER FUNCTIONS -------------------
 
 /**
  * จัดกลุ่มรอบฉายตาม [โรง, วันที่, หนัง] 

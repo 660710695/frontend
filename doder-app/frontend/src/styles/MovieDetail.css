@@ -1,0 +1,127 @@
+/* Root container */
+.detail-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #121212;
+  color: #f0f0f0;
+  min-height: 100vh;
+  padding: 30px 20px;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Poster styling */
+.poster-container {
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 25px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.detail-poster {
+  width: 100%;
+  display: block;
+  border-radius: 10px;
+  transition: transform 0.3s ease;
+}
+
+.detail-poster:hover {
+  transform: scale(1.05);
+}
+
+/* Info panel */
+.detail-info {
+  width: 100%;
+  max-width: 700px;
+  text-align: center;
+  background-color: #1c1c1c;
+  padding: 30px 25px;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.8);
+  backdrop-filter: blur(5px);
+}
+
+.movie-title {
+  font-size: 2rem;
+  margin-bottom: 15px;
+  color: #ff3b3b;
+  text-shadow: 0 0 8px rgba(255,59,59,0.6);
+}
+
+.movie-language,
+.movie-duration {
+  font-size: 1rem;
+  margin-bottom: 10px;
+  color: #ccc;
+}
+
+.movie-description {
+  margin: 20px 0;
+  line-height: 1.6;
+  color: #e0e0e0;
+}
+
+/* Book button */
+.book-btn {
+  padding: 15px 30px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #fff;
+  background: linear-gradient(45deg, #ff3b3b, #ff1e1e);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 20px rgba(255,59,59,0.5);
+}
+
+.book-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 30px rgba(255,59,59,0.7);
+}
+
+/* Loading / error states */
+.detail-container > div {
+  font-size: 1.2rem;
+  margin-top: 50px;
+}
+
+/* Responsive styling */
+@media screen and (min-width: 768px) {
+  .detail-container {
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 40px;
+    padding: 50px 40px;
+  }
+
+  .poster-container {
+    flex: 1;
+    max-width: 350px;
+    margin-bottom: 0;
+  }
+
+  .detail-info {
+    flex: 1.2;
+    text-align: left;
+    padding: 40px 35px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .movie-title {
+    font-size: 1.6rem;
+  }
+
+  .book-btn {
+    font-size: 1rem;
+    padding: 12px 25px;
+  }
+
+  .detail-info {
+    padding: 25px 20px;
+  }
+}

@@ -1,12 +1,10 @@
-import { useState, useEffect } from "react"; // 1. Import Hooks ที่จำเป็น
+import { useState, useEffect } from "react";
 import MovieCard from "../components/MovieCard";
 import "../styles/Movies.css";
-// import { movies } from "../data/movies"; // 2. ลบการ Import ข้อมูลตัวอย่าง
 
 const API_BASE_URL = "http://localhost:8081/api";
 
 function Movies() {
-  // 3. กำหนด State สำหรับเก็บข้อมูลและจัดการสถานะ
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
