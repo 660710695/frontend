@@ -1,24 +1,32 @@
-// src/components/ProtectedRoute.jsx
+// ProtectedRoute.jsx (Revised to include role check)
 
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext'; // Check path
 
-const ProtectedRoute = ({ children }) => {
-    const { user, isLoading } = useAuth();
+// Component accepts an optional prop 'requiredRole'
+const ProtectedRoute = ({ children, requiredRole }) => {
+    // Assuming useAuth() gives you { user, isLoading }
+    const { user, isLoading } = useAuth(); 
     
     if (isLoading) {
-        // Optionally show a loading spinner
-        return <div>Loading...</div>; 
+        return <div>Loading user authentication...</div>; 
     }
 
     if (!user) {
-        // 💥 THIS IS THE FIX 💥
-        // If no user is logged in, redirect them to the /login page
+        // If not logged in, redirect to login page
         return <Navigate to="/login" replace />;
     }
 
-    return children; // If logged in, render the intended component
+    // New Role Check: 
+    if (requiredRole && user.role !== requiredRole) {
+        // If the user is logged in but is not the required role (e.g., customer accessing /admin)
+        // Redirect them to the home page or a 403 Forbidden page
+        alert("Access Denied: Admin privileges required.");
+        return <Navigate to="/" replace />; 
+    }
+
+    return children; // If logged in and role matches, render the intended component
 };
 
 export default ProtectedRoute;

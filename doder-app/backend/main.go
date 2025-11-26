@@ -61,8 +61,9 @@ func main() {
 	if port == "" {
 		port = "8080"
 	}
-
-	log.Printf("Server is running on port %s", port)
+    
+    // 💥 MOVED LOGGING STATEMENT TO BE BEFORE r.Run() 💥
+	log.Printf("Server is running on port %s", port) // Moved to prevent output interference
 
 	if err := r.Run(":" + port); err != nil {
 		log.Fatal("Failed to start server:", err)

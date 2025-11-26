@@ -1,0 +1,77 @@
+/* Container */
+.admin-container {
+  min-height: 100vh;
+  padding: 40px 20px;
+  background-color: #121212;
+  color: #f0f0f0;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  text-align: center;
+}
+
+/* Title */
+.admin-title {
+  font-size: 2.5rem;
+  color: #ff3b3b;
+  text-shadow: 0 0 10px rgba(255, 59, 59, 0.5);
+  margin-bottom: 10px;
+}
+
+/* Subtitle */
+.admin-subtitle {
+  font-size: 1.2rem;
+  color: #bdbdbd;
+  margin-bottom: 40px;
+}
+
+/* Menu Layout */
+.admin-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* Admin Card */
+.admin-card {
+  display: block;
+  padding: 25px;
+  text-decoration: none;
+  background-color: #1c1c1c;
+  border-radius: 12px;
+  border: 1px solid #333;
+  color: white;
+  transition: 0.3s ease;
+  text-align: left;
+  box-shadow: 0 0 18px rgba(0,0,0,0.6);
+}
+
+/* Card hover */
+.admin-card:hover {
+  transform: scale(1.03);
+  border-color: #ff3b3b;
+  box-shadow: 0 0 12px rgba(255,59,59,0.6);
+}
+
+/* Header inside card */
+.admin-card h2 {
+  margin-bottom: 8px;
+  color: #ff5454;
+  font-size: 1.5rem;
+}
+
+/* Description text */
+.admin-card p {
+  color: #cccccc;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .admin-card {
+    padding: 20px;
+  }
+
+  .admin-title {
+    font-size: 2rem;
+  }
+}

@@ -1,0 +1,132 @@
+/* ===============================
+   PROFILE PAGE WRAPPER
+================================= */
+.profile-page {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 25px;
+    background: #111;
+    color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+    animation: fadeIn 0.4s ease;
+    text-align: left;
+}
+
+/* Smooth intro */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===============================
+   HEADER
+================================= */
+.profile-header {
+    text-align: center;
+    font-size: 26px;
+    margin-bottom: 25px;
+    font-weight: bold;
+    border-bottom: 1px solid #333;
+    padding-bottom: 10px;
+}
+
+/* ===============================
+   PROFILE INFO CARD
+================================= */
+.profile-info-card {
+    background: #1a1a1a;
+    border-radius: 10px;
+    padding: 20px;
+    line-height: 1.8;
+    box-shadow: 0 0 8px rgba(255,255,255,0.05) inset;
+}
+
+.profile-info-card strong {
+    color: #ffce45; /* Gold highlight */
+}
+
+/* ===============================
+   ROLE COLORS
+================================= */
+.role-user {
+    color: #4dd0e1;
+    font-weight: bold;
+}
+
+.role-admin {
+    color: #ff4747;
+    font-weight: bold;
+}
+
+/* ===============================
+   LOGOUT BUTTON
+================================= */
+.logout-btn {
+    margin-top: 25px;
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    background: transparent;
+    color: #ff4747;
+    border: 1px solid #ff4747;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.logout-btn:hover {
+    background: #ff4747;
+    color: white;
+}
+
+/* ===============================
+   ADMIN BUTTON
+================================= */
+.admin-link {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.admin-btn {
+    padding: 12px 18px;
+    font-size: 16px;
+    background: #ff4747;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+    width: 100%;
+}
+
+.admin-btn:hover {
+    background: #d73737;
+}
+
+/* ===============================
+   ERROR TEXT
+================================= */
+.error {
+    color: #ff4747;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* ===============================
+   RESPONSIVE
+================================= */
+@media (max-width: 480px) {
+    .profile-page {
+        padding: 18px;
+    }
+
+    .profile-info-card {
+        padding: 15px;
+    }
+
+    .logout-btn, .admin-btn {
+        font-size: 14px;
+        padding: 10px;
+    }
+}
