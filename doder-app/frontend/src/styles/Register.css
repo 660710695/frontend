@@ -1,0 +1,110 @@
+/* Page background */
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #121212;
+  padding: 20px;
+  color: #f0f0f0;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Title */
+.auth-container h1 {
+  font-size: 2rem;
+  color: #ff3b3b;
+  text-shadow: 0 0 8px rgba(255,59,59,0.6);
+  margin-bottom: 20px;
+}
+
+/* Form card */
+.auth-form {
+  background-color: #1c1c1c;
+  padding: 30px 35px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.7);
+  width: 100%;
+  max-width: 420px;
+}
+
+/* Labels */
+.auth-form label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+/* Inputs */
+.auth-form input {
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 15px;
+  background-color: #101010;
+  border: 2px solid #333;
+  border-radius: 8px;
+  color: #f0f0f0;
+  font-size: 1rem;
+  transition: 0.3s;
+}
+
+.auth-form input:focus {
+  outline: none;
+  border-color: #ff3b3b;
+  box-shadow: 0 0 10px rgba(255,59,59,0.5);
+}
+
+/* Button */
+.auth-form button {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(90deg, #ff3b3b, #c62828);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: 0.3s ease;
+  box-shadow: 0 6px 15px rgba(255,59,59,0.4);
+}
+
+.auth-form button:hover {
+  transform: scale(1.03);
+  box-shadow: 0 8px 20px rgba(255,59,59,0.6);
+}
+
+.auth-form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Error message */
+.error-message {
+  background-color: #ff3b3b;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  color: #fff;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Login link */
+.auth-container p {
+  margin-top: 20px;
+  color: #bbb;
+}
+
+.auth-container a {
+  color: #ff3b3b;
+  text-decoration: none;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+.auth-container a:hover {
+  text-shadow: 0 0 8px rgba(255,59,59,0.6);
+}
