@@ -1,5 +1,12 @@
+// App.jsx (Corrected with AuthProvider)
+
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+// Assuming you created AuthContext.jsx in a 'context' folder
+import { AuthProvider } from "./contexts/AuthContext"; 
+
 import Navbar from "./components/Navbar";
+import Login from "./components/Login";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./pages/Home";
 import Cinema from "./pages/Cinema";
 import Movies from "./pages/Movies";
@@ -8,22 +15,42 @@ import Profile from "./pages/Profile";
 import SeatPicker from "./components/SeatPicker";
 import CheckOut from "./pages/CheckOut";
 
-
 function App() {
   return (
-    <BrowserRouter>
-      <Navbar />
+    // 1. WRAP everything with the AuthProvider
+    <AuthProvider> 
+      <BrowserRouter>
+        <Navbar />
 
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/movies" element={<Movies />} />
-        <Route path="/movies/:id" element={<MovieDetail />} />
-        <Route path="/seats" element={<SeatPicker />} />
-        <Route path="/cinema" element={<Cinema />} />
-        <Route path="/checkout" element={<CheckOut />} />
-        <Route path="/profile" element={<Profile />} />
-      </Routes>
-    </BrowserRouter>
+        <Routes>
+          {/* PUBLIC ROUTES (Anyone can access) */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/movies" element={<Movies />} />
+          <Route path="/movies/:id" element={<MovieDetail />} />
+          <Route path="/seats" element={<SeatPicker />} />
+          <Route path="/cinema" element={<Cinema />} />
+
+          {/* PROTECTED ROUTES (Login Required) */}
+          <Route 
+            path="/checkout" 
+            element={
+              <ProtectedRoute>
+                <CheckOut />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/profile" 
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            } 
+          />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 
