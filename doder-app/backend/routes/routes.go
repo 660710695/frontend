@@ -17,34 +17,25 @@ func SetupRoutes(router *gin.Engine, db *sql.DB, cronService *services.CronServi
 	showtimeHandler := handlers.NewShowtimeHandler(db)
 	seatHandler := handlers.NewSeatHandler(db)
 	cronHandler := handlers.NewCronHandler(cronService)
-    
-    // Instantiate AuthHandler
-    authHandler := handlers.NewAuthHandler(db)
-    
-    // Get the AuthMiddleware
-    authMiddleware := handlers.AuthMiddleware()
-    // Get the AdminMiddleware
-    adminMiddleware := handlers.AdminMiddleware()
-
+	authHandler := handlers.NewAuthHandler(db)
+	authMiddleware := handlers.AuthMiddleware()
+	adminMiddleware := handlers.AdminMiddleware()
 
 	api := router.Group("/api")
 	{
-		// 💥 NEW AUTHENTICATION ROUTES 💥
-        auth := api.Group("/auth")
-        {
-            auth.POST("/register", authHandler.Register)
-            auth.POST("/login", authHandler.Login)
-            
-            // Protected route (requires token)
-            auth.GET("/profile", authMiddleware, authHandler.GetProfile)
-        }
-        
+		// Authen
+		auth := api.Group("/auth")
+		{
+			auth.POST("/register", authHandler.Register)
+			auth.POST("/login", authHandler.Login)
+			auth.GET("/profile", authMiddleware, authHandler.GetProfile)
+		}
+
 		// Public
 
 		// Movies
 		api.GET("/movies", movieHandler.GetAllMovies)
 		api.GET("/movies/:id", movieHandler.GetMovieByID)
-        // ... (other public routes) ...
 
 		// Cinemas
 		api.GET("/cinemas", cinemaHandler.GetAllCinemas)
@@ -63,7 +54,7 @@ func SetupRoutes(router *gin.Engine, db *sql.DB, cronService *services.CronServi
 		api.GET("/seats/:id", seatHandler.GetSeatByID)
 
 		// Admin
-		admin := api.Group("/admin", authMiddleware, adminMiddleware) // Apply both Auth and Admin middleware here
+		admin := api.Group("/admin", authMiddleware, adminMiddleware)
 		{
 			// Movies
 			admin.POST("/movies", movieHandler.CreateMovie)
