@@ -5,8 +5,10 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/gin-gonic/gin"
 	"movie-booking-system/models"
+
+	"github.com/gin-gonic/gin"
+	"github.com/lib/pq"
 )
 
 type MovieHandler struct {
@@ -29,9 +31,14 @@ func (h *MovieHandler) CreateMovie(c *gin.Context) {
 		return
 	}
 
+	genres := req.Genres
+	if genres == nil {
+		genres = []string{}
+	}
+
 	query := `
-		INSERT INTO movies (title, description, duration, language, subtitle, poster_url, release_date, is_active)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, TRUE)
+		INSERT INTO movies (title, description, duration, genres, language, subtitle, poster_url, release_date, is_active)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, TRUE)
 		RETURNING movie_id, created_at, updated_at
 	`
 
@@ -39,6 +46,7 @@ func (h *MovieHandler) CreateMovie(c *gin.Context) {
 	movie.Title = req.Title
 	movie.Description = req.Description
 	movie.Duration = req.Duration
+	movie.Genres = genres
 	movie.Language = req.Language
 	movie.Subtitle = req.Subtitle
 	movie.PosterURL = req.PosterURL
@@ -47,7 +55,7 @@ func (h *MovieHandler) CreateMovie(c *gin.Context) {
 
 	err := h.db.QueryRow(
 		query,
-		req.Title, req.Description, req.Duration,
+		req.Title, req.Description, req.Duration, pq.Array(genres),
 		req.Language, req.Subtitle, req.PosterURL, req.ReleaseDate,
 	).Scan(&movie.MovieID, &movie.CreatedAt, &movie.UpdatedAt)
 
@@ -67,24 +75,33 @@ func (h *MovieHandler) CreateMovie(c *gin.Context) {
 }
 
 // GetAllMovies ดึงข้อมูลหนังทั้งหมด
-// GET /api/movies?is_active=true
+// GET /api/movies?is_active=true&genre=Action
 func (h *MovieHandler) GetAllMovies(c *gin.Context) {
 	isActiveParam := c.Query("is_active")
+	genreParam := c.Query("genre")
 
 	query := `
-		SELECT movie_id, title, description, duration, language, subtitle, 
+		SELECT movie_id, title, description, duration, genres, language, subtitle, 
 		       poster_url, release_date, is_active, created_at, updated_at
 		FROM movies
+		WHERE 1=1
 	`
 	args := []interface{}{}
+	argIndex := 1
 
-	// กรองเฉพาะหนังที่เปิดฉายถ้ามี query parameter
 	if isActiveParam != "" {
 		isActive, err := strconv.ParseBool(isActiveParam)
 		if err == nil {
-			query += " WHERE is_active = $1"
+			query += " AND is_active = $" + strconv.Itoa(argIndex)
 			args = append(args, isActive)
+			argIndex++
 		}
+	}
+
+	if genreParam != "" {
+		query += " AND $" + strconv.Itoa(argIndex) + " = ANY(genres)"
+		args = append(args, genreParam)
+		argIndex++
 	}
 
 	query += " ORDER BY release_date DESC, created_at DESC"
@@ -107,6 +124,7 @@ func (h *MovieHandler) GetAllMovies(c *gin.Context) {
 			&movie.Title,
 			&movie.Description,
 			&movie.Duration,
+			&movie.Genres,
 			&movie.Language,
 			&movie.Subtitle,
 			&movie.PosterURL,
@@ -141,7 +159,7 @@ func (h *MovieHandler) GetMovieByID(c *gin.Context) {
 	}
 
 	query := `
-		SELECT movie_id, title, description, duration, language, subtitle,
+		SELECT movie_id, title, description, duration, genres, language, subtitle,
 		       poster_url, release_date, is_active, created_at, updated_at
 		FROM movies
 		WHERE movie_id = $1
@@ -153,6 +171,7 @@ func (h *MovieHandler) GetMovieByID(c *gin.Context) {
 		&movie.Title,
 		&movie.Description,
 		&movie.Duration,
+		&movie.Genres,
 		&movie.Language,
 		&movie.Subtitle,
 		&movie.PosterURL,
@@ -226,6 +245,11 @@ func (h *MovieHandler) UpdateMovie(c *gin.Context) {
 		args = append(args, *req.Duration)
 		argIndex++
 	}
+	if req.Genres != nil {
+		query += ", genres = $" + strconv.Itoa(argIndex)
+		args = append(args, pq.Array(req.Genres))
+		argIndex++
+	}
 	if req.Language != nil {
 		query += ", language = $" + strconv.Itoa(argIndex)
 		args = append(args, *req.Language)
@@ -292,7 +316,6 @@ func (h *MovieHandler) DeleteMovie(c *gin.Context) {
 		return
 	}
 
-	// ไม่ลบจริง แค่เปลี่ยน is_active เป็น false
 	query := "UPDATE movies SET is_active = FALSE, updated_at = CURRENT_TIMESTAMP WHERE movie_id = $1"
 	result, err := h.db.Exec(query, movieID)
 	if err != nil {
