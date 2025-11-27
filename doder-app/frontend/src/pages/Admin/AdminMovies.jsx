@@ -20,15 +20,38 @@ function AdminMovies() {
 
     const [creationStatus, setCreationStatus] = useState(null);
 
+    // --- FETCH ALL MOVIES (READ) ---
     const fetchMovies = async () => {
         setLoading(true);
         setError(null);
+
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            setError("Unauthorized: Please log in again.");
+            setLoading(false);
+            return;
+        }
+
         try {
-            const response = await fetch(`${API_BASE_URL}/movies`);
-            if (!response.ok) throw new Error("Failed to fetch movie list.");
+            const response = await fetch(`${API_BASE_URL}/movies`, {
+                method: 'GET',
+                headers: {
+                    // FIX 2: Added Authorization Header for fetchMovies
+                    'Authorization': `Bearer ${token}`
+                },
+            });
+
             const data = await response.json();
+
+            // Check if the backend returned an error (e.g., 403 Forbidden because it's in the admin group)
+            if (!response.ok || !data.success) {
+                throw new Error(data.error || "Failed to fetch movie list.");
+            }
+
             setMovies(data.data || []);
+
         } catch (err) {
+            // Display the specific error message (e.g., "Admin access required")
             setError(err.message);
             console.error("Fetch error:", err);
         } finally {
@@ -45,6 +68,9 @@ function AdminMovies() {
         setNewMovie(prev => ({ ...prev, [name]: value }));
     };
 
+
+    // --- CREATE NEW MOVIE (Runs ONLY on form submission) ---
+    // FIX 1: Correctly defined handleCreateMovie function
     const handleCreateMovie = async (e) => {
         e.preventDefault();
         setCreationStatus(null);
@@ -55,6 +81,14 @@ function AdminMovies() {
             return;
         }
 
+        // 💥 FIX: Prepare the payload and convert duration to number 💥
+        const payload = {
+            ...newMovie,
+            duration: parseInt(newMovie.duration, 10), // Convert string to integer
+            // Ensure total_seats is a number too, if that field exists and uses string input
+            // total_seats: parseInt(newMovie.total_seats, 10), 
+        };
+
         try {
             const response = await fetch(`${API_BASE_URL}/admin/movies`, {
                 method: 'POST',
@@ -62,48 +96,54 @@ function AdminMovies() {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify(newMovie),
+                // Send the converted payload
+                body: JSON.stringify(payload),
             });
 
             const data = await response.json();
 
             if (!response.ok || !data.success) {
+                // Display the specific error from Go if conversion fails again, or other error occurs
                 throw new Error(data.error || "Failed to create movie.");
             }
 
             setCreationStatus({ type: 'success', message: "Movie created successfully!" });
-            fetchMovies();
+            fetchMovies(); // Refresh the list
 
+            // Reset form fields after success
             setNewMovie({
-                title: '',
-                description: '',
-                duration: 0,
-                language: '',
-                subtitle: '',
-                poster_url: '',
-                release_date: '',
+                title: '', description: '', duration: 0, language: '',
+                subtitle: '', poster_url: '', release_date: '',
             });
 
         } catch (err) {
-            setCreationStatus({ type: 'error', message: err.message });
+            // ... error handling ...
+            setCreationStatus({ type: 'error', message: `Creation failed: ${err.message}` });
         }
     };
 
-    const handleDeleteMovie = async (id) => {
+    // --- DELETE MOVIE (Soft Delete) ---
+    const handleDeleteMovie = async (movieId) => { // FIX 3: Changed function param to movieId for clarity
         if (!window.confirm("Are you sure you want to deactivate this movie?")) return;
 
         const token = localStorage.getItem('authToken');
         if (!token) return;
 
         try {
-            const response = await fetch(`${API_BASE_URL}/admin/movies/${id}`, {
+            const response = await fetch(`${API_BASE_URL}/admin/movies/${movieId}`, {
                 method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
+                headers: {
+                    'Authorization': `Bearer ${token}` // ✅ Token sent
+                }
             });
 
-            if (!response.ok) throw new Error("Failed to delete movie.");
+            const data = await response.json();
 
-            setCreationStatus({ type: 'success', message: `Movie ID ${id} deactivated.` });
+            if (!response.ok || !data.success) {
+                throw new Error(data.error || "Failed to delete movie.");
+            }
+
+            setCreationStatus({ type: 'success', message: `Movie ID ${movieId} deactivated.` });
             fetchMovies();
 
         } catch (err) {
@@ -112,6 +152,9 @@ function AdminMovies() {
     };
 
     if (loading) return <div className="admin-loading">กำลังโหลด...</div>;
+
+    // Display general errors (like initial fetch failure)
+    if (error) return <div className="admin-error">Error: {error}</div>;
 
     return (
         <div className="admin-movies-container">

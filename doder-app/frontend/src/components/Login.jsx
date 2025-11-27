@@ -1,7 +1,8 @@
-// Login.jsx
+// Login.jsx (Corrected for immediate state update)
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext'; // 💥 Import useAuth 💥
 
 const API_BASE_URL = "http://localhost:8081/api";
 
@@ -15,6 +16,10 @@ function Login() {
     const [loading, setLoading] = useState(false);
     
     const navigate = useNavigate();
+    
+    // 💥 1. Destructure checkAuthStatus from useAuth 💥
+    // We use this function to manually trigger the global state update after success
+    const { checkAuthStatus } = useAuth(); 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -43,8 +48,11 @@ function Login() {
             const { token } = data.data;
 
             // 2. Store JWT Token in Local Storage
-            // This token is needed for all future protected API calls (like /api/auth/profile)
             localStorage.setItem('authToken', token);
+            
+            // 💥 2. FIX: Manually trigger the global state update 💥
+            // This ensures the Navbar and ProtectedRoute see the 'admin' role immediately.
+            await checkAuthStatus(); 
             
             // 3. Redirect the user to the home page
             navigate('/'); 
