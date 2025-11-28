@@ -20,6 +20,8 @@ import AdminDashboard from "./pages/Admin/AdminDashboard"; // Assuming this path
 import AdminMovies from "./pages/Admin/AdminMovies";     // Assuming this path
 import AdminCinemas from "./pages/Admin/AdminCinemas";
 import AdminTheaters from "./pages/Admin/AdminTheaters";
+import AdminShowtimes from "./pages/Admin/AdminShowtimes";
+import AdminSeats from "./pages/Admin/AdminSeats";
 // You will need AdminShowtimes.jsx and AdminCinemas.jsx later
 
 function App() {
@@ -79,6 +81,15 @@ function App() {
             element={
               <ProtectedRoute requiredRole="admin">
                 <AdminTheaters />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/seats"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminSeats />
               </ProtectedRoute>
             }
           />
