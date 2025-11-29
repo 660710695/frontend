@@ -505,10 +505,25 @@ func (h *BookingHandler) ConfirmPayment(c *gin.Context) {
 	var conflictSeatID int
 	err = h.db.QueryRow(conflictQuery, bookingID, showtimeID).Scan(&conflictSeatID)
 	if err == nil {
-		// มีที่นั่งถูก confirm ไปแล้วโดยคนอื่น
+		// มีที่นั่งถูก confirm ไปแล้วโดยคนอื่น → ยกเลิกการจองนี้โดยอัตโนมัติ
+		cancelQuery := `
+			UPDATE bookings 
+			SET booking_status = 'cancelled', updated_at = CURRENT_TIMESTAMP
+			WHERE booking_id = $1
+		`
+		h.db.Exec(cancelQuery, bookingID)
+
+		// คืน seat_status กลับเป็น available
+		releaseSeatQuery := `
+			UPDATE seat_status 
+			SET status = 'available', booking_id = NULL, reserved_until = NULL
+			WHERE booking_id = $1
+		`
+		h.db.Exec(releaseSeatQuery, bookingID)
+
 		c.JSON(http.StatusConflict, models.ErrorResponse{
 			Success: false,
-			Error:   fmt.Sprintf("Seat %d has already been confirmed by another booking. Please select different seats.", conflictSeatID),
+			Error:   fmt.Sprintf("Seat %d has already been confirmed by another booking. Your booking has been automatically cancelled.", conflictSeatID),
 		})
 		return
 	}
