@@ -7,7 +7,7 @@ type Theater struct {
 	CinemaID    int       `json:"cinema_id" db:"cinema_id"`
 	TheaterName string    `json:"theater_name" db:"theater_name"`
 	TotalSeats  int       `json:"total_seats" db:"total_seats"`
-	TheaterType *string   `json:"theater_type,omitempty" db:"theater_type"` // 'standard', 'vip', 'imax', '4dx'
+	TheaterType *string   `json:"theater_type,omitempty" db:"theater_type"`
 	IsActive    bool      `json:"is_active" db:"is_active"`
 	CreatedAt   time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at" db:"updated_at"`

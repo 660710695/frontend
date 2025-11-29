@@ -5,8 +5,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/gin-gonic/gin"
 	"movie-booking-system/models"
+
+	"github.com/gin-gonic/gin"
 )
 
 type SeatHandler struct {
@@ -29,7 +30,6 @@ func (h *SeatHandler) CreateSeat(c *gin.Context) {
 		return
 	}
 
-	// ตรวจสอบว่า theater มีอยู่จริง
 	var exists bool
 	err := h.db.QueryRow("SELECT EXISTS(SELECT 1 FROM theaters WHERE theater_id = $1)", req.TheaterID).Scan(&exists)
 	if err != nil || !exists {
@@ -40,7 +40,6 @@ func (h *SeatHandler) CreateSeat(c *gin.Context) {
 		return
 	}
 
-	// ตรวจสอบว่าที่นั่งซ้ำหรือไม่
 	err = h.db.QueryRow(
 		"SELECT EXISTS(SELECT 1 FROM seats WHERE theater_id = $1 AND seat_row = $2 AND seat_number = $3)",
 		req.TheaterID, req.SeatRow, req.SeatNumber,
@@ -101,7 +100,6 @@ func (h *SeatHandler) CreateSeatsInBulk(c *gin.Context) {
 		return
 	}
 
-	// ตรวจสอบว่า theater มีอยู่จริง
 	var exists bool
 	err := h.db.QueryRow("SELECT EXISTS(SELECT 1 FROM theaters WHERE theater_id = $1)", req.TheaterID).Scan(&exists)
 	if err != nil || !exists {
@@ -112,7 +110,6 @@ func (h *SeatHandler) CreateSeatsInBulk(c *gin.Context) {
 		return
 	}
 
-	// เริ่ม transaction
 	tx, err := h.db.Begin()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
@@ -131,10 +128,8 @@ func (h *SeatHandler) CreateSeatsInBulk(c *gin.Context) {
 	createdCount := 0
 	skippedCount := 0
 
-	// สร้างที่นั่งตามแถวและจำนวนที่กำหนด
 	for _, row := range req.Rows {
 		for seatNum := 1; seatNum <= req.SeatsPerRow; seatNum++ {
-			// ตรวจสอบว่าที่นั่งมีอยู่แล้วหรือไม่
 			var seatExists bool
 			err := tx.QueryRow(
 				"SELECT EXISTS(SELECT 1 FROM seats WHERE theater_id = $1 AND seat_row = $2 AND seat_number = $3)",
@@ -149,13 +144,11 @@ func (h *SeatHandler) CreateSeatsInBulk(c *gin.Context) {
 				return
 			}
 
-			// ถ้าที่นั่งมีอยู่แล้ว ข้ามไป
 			if seatExists {
 				skippedCount++
 				continue
 			}
 
-			// สร้างที่นั่งใหม่
 			_, err = tx.Exec(
 				"INSERT INTO seats (theater_id, seat_row, seat_number, seat_type, is_active) VALUES ($1, $2, $3, $4, TRUE)",
 				req.TheaterID, row, seatNum, seatType,
@@ -171,7 +164,6 @@ func (h *SeatHandler) CreateSeatsInBulk(c *gin.Context) {
 		}
 	}
 
-	// Commit transaction
 	if err := tx.Commit(); err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
 			Success: false,
@@ -222,7 +214,6 @@ func (h *SeatHandler) GetAllSeats(c *gin.Context) {
 	args := []interface{}{theaterID}
 	argIndex := 2
 
-	// กรองตาม is_active
 	if isActiveParam != "" {
 		isActive, err := strconv.ParseBool(isActiveParam)
 		if err == nil {
@@ -342,7 +333,6 @@ func (h *SeatHandler) UpdateSeat(c *gin.Context) {
 		return
 	}
 
-	// สร้าง dynamic query
 	query := "UPDATE seats SET"
 	args := []interface{}{}
 	argIndex := 1
@@ -416,7 +406,6 @@ func (h *SeatHandler) DeleteSeat(c *gin.Context) {
 		return
 	}
 
-	// ปิดการใช้งานแทนการลบจริง
 	query := "UPDATE seats SET is_active = FALSE WHERE seat_id = $1"
 	result, err := h.db.Exec(query, seatID)
 	if err != nil {

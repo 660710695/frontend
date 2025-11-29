@@ -5,8 +5,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/gin-gonic/gin"
 	"movie-booking-system/models"
+
+	"github.com/gin-gonic/gin"
 )
 
 type ShowtimeHandler struct {
@@ -29,7 +30,6 @@ func (h *ShowtimeHandler) CreateShowtime(c *gin.Context) {
 		return
 	}
 
-	// ดึงจำนวนที่นั่งทั้งหมดจากห้องฉาย
 	var totalSeats int
 	err := h.db.QueryRow("SELECT total_seats FROM theaters WHERE theater_id = $1", req.TheaterID).Scan(&totalSeats)
 	if err != nil {
@@ -99,7 +99,6 @@ func (h *ShowtimeHandler) GetAllShowtimes(c *gin.Context) {
 	args := []interface{}{}
 	argIndex := 1
 
-	// กรองตาม movie_id
 	if movieIDParam != "" {
 		movieID, err := strconv.Atoi(movieIDParam)
 		if err == nil {
@@ -109,7 +108,6 @@ func (h *ShowtimeHandler) GetAllShowtimes(c *gin.Context) {
 		}
 	}
 
-	// กรองตาม theater_id
 	if theaterIDParam != "" {
 		theaterID, err := strconv.Atoi(theaterIDParam)
 		if err == nil {
@@ -119,14 +117,12 @@ func (h *ShowtimeHandler) GetAllShowtimes(c *gin.Context) {
 		}
 	}
 
-	// กรองตามวันที่
 	if showDateParam != "" {
 		query += " AND s.show_date = $" + strconv.Itoa(argIndex)
 		args = append(args, showDateParam)
 		argIndex++
 	}
 
-	// กรองตาม is_active
 	if isActiveParam != "" {
 		isActive, err := strconv.ParseBool(isActiveParam)
 		if err == nil {
@@ -269,7 +265,6 @@ func (h *ShowtimeHandler) UpdateShowtime(c *gin.Context) {
 		return
 	}
 
-	// สร้าง dynamic query
 	query := "UPDATE showtimes SET updated_at = CURRENT_TIMESTAMP"
 	args := []interface{}{}
 	argIndex := 1
@@ -340,7 +335,6 @@ func (h *ShowtimeHandler) DeleteShowtime(c *gin.Context) {
 		return
 	}
 
-	// ไม่ลบจริง แค่เปลี่ยน is_active เป็น false
 	query := "UPDATE showtimes SET is_active = FALSE, updated_at = CURRENT_TIMESTAMP WHERE showtime_id = $1"
 	result, err := h.db.Exec(query, showtimeID)
 	if err != nil {

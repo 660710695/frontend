@@ -189,7 +189,6 @@ func (s *CronService) GetCronStatus() map[string]interface{} {
 
 	status["pending_reservations"] = pendingCount
 
-	// นับจำนวนการจองที่หมดอายุแล้ว (รอยกเลิก)
 	var expiredCount int
 	s.db.QueryRow(`
 		SELECT COUNT(DISTINCT b.booking_id)

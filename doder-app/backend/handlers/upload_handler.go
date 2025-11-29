@@ -100,7 +100,6 @@ func (h *UploadHandler) UploadPoster(c *gin.Context) {
 func (h *UploadHandler) DeletePoster(c *gin.Context) {
 	filename := c.Param("filename")
 
-	// ป้องกัน path traversal
 	if strings.Contains(filename, "..") || strings.Contains(filename, "/") {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse{
 			Success: false,

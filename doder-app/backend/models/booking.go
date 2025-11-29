@@ -8,8 +8,8 @@ type Booking struct {
 	ShowtimeID    int       `json:"showtime_id" db:"showtime_id"`
 	BookingDate   time.Time `json:"booking_date" db:"booking_date"`
 	TotalAmount   float64   `json:"total_amount" db:"total_amount"`
-	BookingStatus string    `json:"booking_status" db:"booking_status"` // 'pending', 'confirmed', 'cancelled'
-	PaymentStatus string    `json:"payment_status" db:"payment_status"` // 'pending', 'paid', 'refunded'
+	BookingStatus string    `json:"booking_status" db:"booking_status"`
+	PaymentStatus string    `json:"payment_status" db:"payment_status"`
 	BookingCode   string    `json:"booking_code" db:"booking_code"`
 	CreatedAt     time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at" db:"updated_at"`

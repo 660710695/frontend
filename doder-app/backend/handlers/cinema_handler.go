@@ -5,8 +5,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/gin-gonic/gin"
 	"movie-booking-system/models"
+
+	"github.com/gin-gonic/gin"
 )
 
 type CinemaHandler struct {
@@ -67,7 +68,6 @@ func (h *CinemaHandler) GetAllCinemas(c *gin.Context) {
 	query := "SELECT cinema_id, cinema_name, address, city, is_active, created_at, updated_at FROM cinemas"
 	args := []interface{}{}
 
-	// กรองตาม is_active ถ้ามี query parameter
 	if isActiveParam != "" {
 		isActive, err := strconv.ParseBool(isActiveParam)
 		if err == nil {
@@ -186,7 +186,6 @@ func (h *CinemaHandler) UpdateCinema(c *gin.Context) {
 		return
 	}
 
-	// สร้าง dynamic query สำหรับ update เฉพาะฟิลด์ที่ส่งมา
 	query := "UPDATE cinemas SET updated_at = CURRENT_TIMESTAMP"
 	args := []interface{}{}
 	argIndex := 1
@@ -252,7 +251,6 @@ func (h *CinemaHandler) DeleteCinema(c *gin.Context) {
 		return
 	}
 
-	// ไม่ลบจริง แค่เปลี่ยน is_active เป็น false
 	query := "UPDATE cinemas SET is_active = FALSE, updated_at = CURRENT_TIMESTAMP WHERE cinema_id = $1"
 	result, err := h.db.Exec(query, cinemaID)
 	if err != nil {

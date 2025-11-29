@@ -225,7 +225,6 @@ func (h *MovieHandler) UpdateMovie(c *gin.Context) {
 		return
 	}
 
-	// สร้าง dynamic query สำหรับ update เฉพาะฟิลด์ที่ส่งมา
 	query := "UPDATE movies SET updated_at = CURRENT_TIMESTAMP"
 	args := []interface{}{}
 	argIndex := 1

@@ -6,9 +6,9 @@ type Showtime struct {
 	ShowtimeID     int       `json:"showtime_id" db:"showtime_id"`
 	MovieID        int       `json:"movie_id" db:"movie_id"`
 	TheaterID      int       `json:"theater_id" db:"theater_id"`
-	ShowDate       string    `json:"show_date" db:"show_date"` // YYYY-MM-DD
-	ShowTime       string    `json:"show_time" db:"show_time"` // HH:MM:SS
-	EndTime        string    `json:"end_time" db:"end_time"`   // HH:MM:SS
+	ShowDate       string    `json:"show_date" db:"show_date"`
+	ShowTime       string    `json:"show_time" db:"show_time"`
+	EndTime        string    `json:"end_time" db:"end_time"`
 	Price          float64   `json:"price" db:"price"`
 	AvailableSeats int       `json:"available_seats" db:"available_seats"`
 	IsActive       bool      `json:"is_active" db:"is_active"`

@@ -15,7 +15,7 @@ type Movie struct {
 	Language    *string        `json:"language,omitempty" db:"language"`
 	Subtitle    *string        `json:"subtitle,omitempty" db:"subtitle"`
 	PosterURL   *string        `json:"poster_url,omitempty" db:"poster_url"`
-	ReleaseDate *string        `json:"release_date,omitempty" db:"release_date"` // YYYY-MM-DD
+	ReleaseDate *string        `json:"release_date,omitempty" db:"release_date"`
 	IsActive    bool           `json:"is_active" db:"is_active"`
 	CreatedAt   time.Time      `json:"created_at" db:"created_at"`
 	UpdatedAt   time.Time      `json:"updated_at" db:"updated_at"`
@@ -29,7 +29,7 @@ type CreateMovieRequest struct {
 	Language    *string  `json:"language"`
 	Subtitle    *string  `json:"subtitle"`
 	PosterURL   *string  `json:"poster_url"`
-	ReleaseDate *string  `json:"release_date"` // YYYY-MM-DD format
+	ReleaseDate *string  `json:"release_date"`
 }
 
 type UpdateMovieRequest struct {
