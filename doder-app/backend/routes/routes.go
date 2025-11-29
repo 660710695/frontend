@@ -60,7 +60,9 @@ func SetupRoutes(router *gin.Engine, db *sql.DB, cronService *services.CronServi
 		bookings := api.Group("/bookings", authMiddleware)
 		{
 			bookings.POST("", bookingHandler.CreateBooking)
+			bookings.GET("/my-bookings", bookingHandler.GetUserBookings)
 			bookings.GET("/:id", bookingMiddleware.BookingExistsMiddleware(), bookingMiddleware.BookingOwnerMiddleware(), bookingHandler.GetBooking)
+			bookings.PUT("/:id/confirm-payment", bookingMiddleware.BookingExistsMiddleware(), bookingMiddleware.BookingOwnerMiddleware(), bookingHandler.ConfirmPayment)
 			bookings.DELETE("/:id", bookingMiddleware.BookingExistsMiddleware(), bookingMiddleware.BookingOwnerMiddleware(), bookingHandler.CancelBooking)
 		}
 

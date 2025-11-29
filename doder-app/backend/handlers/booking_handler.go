@@ -194,8 +194,12 @@ func (h *BookingHandler) GetBooking(c *gin.Context) {
 	`
 
 	var booking models.Booking
+	var movieTitle, cinemaName, theaterName string
+	var showDate, showTime sql.NullTime
 	err = h.db.QueryRow(query, bookingID).Scan(
 		&booking.BookingID, &booking.BookingCode, &booking.UserID, &booking.ShowtimeID,
+		&movieTitle, &cinemaName, &theaterName,
+		&showDate, &showTime,
 		&booking.TotalAmount, &booking.BookingStatus, &booking.PaymentStatus, &booking.BookingDate,
 	)
 
@@ -217,7 +221,21 @@ func (h *BookingHandler) GetBooking(c *gin.Context) {
 
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
-		Data:    booking,
+		Data: gin.H{
+			"booking_id":     booking.BookingID,
+			"booking_code":   booking.BookingCode,
+			"user_id":        booking.UserID,
+			"showtime_id":    booking.ShowtimeID,
+			"movie_title":    movieTitle,
+			"cinema_name":    cinemaName,
+			"theater_name":   theaterName,
+			"show_date":      showDate,
+			"show_time":      showTime,
+			"total_amount":   booking.TotalAmount,
+			"booking_status": booking.BookingStatus,
+			"payment_status": booking.PaymentStatus,
+			"booking_date":   booking.BookingDate,
+		},
 	})
 }
 
@@ -362,6 +380,138 @@ func (h *BookingHandler) GetAllBookings(c *gin.Context) {
 	`
 
 	rows, err := h.db.Query(query)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Success: false,
+			Error:   "Failed to fetch bookings",
+		})
+		return
+	}
+	defer rows.Close()
+
+	bookings := []models.Booking{}
+	for rows.Next() {
+		var booking models.Booking
+		err := rows.Scan(
+			&booking.BookingID, &booking.BookingCode, &booking.UserID, &booking.ShowtimeID,
+			&booking.TotalAmount, &booking.BookingStatus, &booking.PaymentStatus, &booking.BookingDate,
+		)
+		if err != nil {
+			continue
+		}
+		bookings = append(bookings, booking)
+	}
+
+	c.JSON(http.StatusOK, models.Response{
+		Success: true,
+		Data:    bookings,
+	})
+}
+
+// ConfirmPayment ยืนยันการชำระเงิน
+// PUT /api/bookings/:id/confirm-payment
+func (h *BookingHandler) ConfirmPayment(c *gin.Context) {
+	bookingID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Success: false,
+			Error:   "Invalid booking ID",
+		})
+		return
+	}
+
+	// ตรวจสอบว่าการจองมีอยู่และยังไม่ได้ชำระเงิน
+	var bookingStatus, paymentStatus string
+	query := "SELECT booking_status, payment_status FROM bookings WHERE booking_id = $1"
+	err = h.db.QueryRow(query, bookingID).Scan(&bookingStatus, &paymentStatus)
+	if err == sql.ErrNoRows {
+		c.JSON(http.StatusNotFound, models.ErrorResponse{
+			Success: false,
+			Error:   "Booking not found",
+		})
+		return
+	}
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Success: false,
+			Error:   "Failed to fetch booking",
+		})
+		return
+	}
+
+	// ตรวจสอบสถานะ
+	if bookingStatus == "cancelled" {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Success: false,
+			Error:   "Cannot confirm payment for cancelled booking",
+		})
+		return
+	}
+
+	if paymentStatus == "paid" {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Success: false,
+			Error:   "This booking has already been paid",
+		})
+		return
+	}
+
+	// อัปเดต payment_status และ booking_status
+	updateQuery := `
+		UPDATE bookings 
+		SET payment_status = 'paid', booking_status = 'confirmed', updated_at = CURRENT_TIMESTAMP
+		WHERE booking_id = $1
+	`
+	result, err := h.db.Exec(updateQuery, bookingID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Success: false,
+			Error:   "Failed to confirm payment",
+		})
+		return
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil || rowsAffected == 0 {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Success: false,
+			Error:   "Failed to update booking",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, models.Response{
+		Success: true,
+		Message: "Payment confirmed successfully",
+		Data: gin.H{
+			"booking_id":     bookingID,
+			"payment_status": "paid",
+			"booking_status": "confirmed",
+		},
+	})
+}
+
+// GetUserBookings ดึงข้อมูลการจองของผู้ใช้
+// GET /api/bookings/my-bookings
+func (h *BookingHandler) GetUserBookings(c *gin.Context) {
+	userID := c.GetInt("user_id")
+
+	query := `
+		SELECT 
+			b.booking_id, b.booking_code, b.user_id, b.showtime_id,
+			m.title, c.cinema_name, t.theater_name, 
+			s.show_date, s.show_time, 
+			b.total_amount, b.booking_status, b.payment_status, b.booking_date
+		FROM bookings b
+		JOIN showtimes s ON b.showtime_id = s.showtime_id
+		JOIN movies m ON s.movie_id = m.movie_id
+		JOIN theaters t ON s.theater_id = t.theater_id
+		JOIN cinemas c ON t.cinema_id = c.cinema_id
+		WHERE b.user_id = $1
+		ORDER BY b.booking_date DESC
+	`
+
+	rows, err := h.db.Query(query, userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
 			Success: false,
