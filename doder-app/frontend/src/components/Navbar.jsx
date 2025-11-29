@@ -1,18 +1,24 @@
-// Navbar.jsx (Corrected for Authentication Status)
+// Navbar.jsx (Modified for Admin Link Placement and Styling)
 
 import { Link, useNavigate } from "react-router-dom";
-import { FaUserCircle } from "react-icons/fa";
+import { FaUserCircle, FaCaretDown } from "react-icons/fa";
 import { useAuth } from '../contexts/AuthContext';
 import "../styles/Navbar.css";
 import LogoIcon from "../images/DoderLogo.png";
+import { useState } from "react";
 
 function Navbar() {
-  const { user, isLoading, logout } = useAuth(); // Destructure states and functions
+  const { user, isLoading, logout } = useAuth();
   const navigate = useNavigate();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const handleLogout = () => {
-    logout(); // Calls logout function from AuthContext
+    logout();
     navigate('/');
+  };
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(prev => !prev);
   };
 
   return (
@@ -29,30 +35,48 @@ function Navbar() {
       </div>
 
       <div className="right">
-        {/* Conditional Rendering based on Auth Status */}
         {isLoading ? (
-          // 1. Loading State
           <span style={{ color: 'white' }}>...</span>
         ) : user ? (
-          // 2. Logged In State
+          // Logged In State
           <>
-            {/* Display Admin Link if user is an admin */}
+            {/* 👈 The Admin link is now placed here, outside the profile dropdown,
+                 using the new 'nav-link' class for styling. */}
             {user.role === 'admin' && (
-                <Link to="/admin" className="admin-link">Admin</Link>
+                // Using 'nav-link' class to mimic the look of 'menu a'
+                <Link to="/admin" className="nav-link">Admin</Link> 
             )}
             
-            {/* Profile Link */}
-            <Link to="/profile" className="profile-link" aria-label="Profile">
+            <div className="profile-dropdown-container">
+              <button 
+                onClick={toggleDropdown} 
+                className="profile-btn"
+                aria-expanded={isDropdownOpen}
+                aria-controls="profile-menu"
+              >
                 <FaUserCircle size={30} />
-            </Link>
-            
-            {/* Logout Button */}
-            <button onClick={handleLogout} className="logout-btn">
-                ออกจากระบบ
-            </button>
+                <FaCaretDown size={14} className="dropdown-caret" />
+              </button>
+              
+              {isDropdownOpen && (
+                <div id="profile-menu" className="dropdown-menu">
+                  <span className="dropdown-info">
+                    {user.name || "My Account"}
+                  </span>
+                  
+                  <Link to="/profile" className="dropdown-item">
+                    ดูโปรไฟล์
+                  </Link>
+                  
+                  <button onClick={handleLogout} className="dropdown-item logout-item">
+                    ออกจากระบบ
+                  </button>
+                </div>
+              )}
+            </div>
           </>
         ) : (
-          // 3. Logged Out State
+          // Logged Out State
           <Link to="/login" className="login-link">
             เข้าสู่ระบบ / ลงทะเบียน
           </Link>

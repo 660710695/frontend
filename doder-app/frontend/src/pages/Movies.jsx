@@ -126,33 +126,6 @@ function Movies() {
             <div className="search-container">
               <SearchBar onSearch={handleSearch} placeholder="ค้นหาภาพยนตร์..." />
             </div>
-
-            {/* Genre Filter */}
-            <select
-              className="filter-select"
-              value={selectedGenre}
-              onChange={(e) => handleGenreFilter(e.target.value)}
-            >
-              <option value="all">ทุกประเภท</option>
-              <option value="action">แอคชั่น</option>
-              <option value="comedy">喜剧</option>
-              <option value="drama">ดราม่า</option>
-              <option value="horror">สยองขวัญ</option>
-              <option value="romance">โรแมนติก</option>
-              <option value="sci-fi">วิทยาศาสตร์</option>
-              <option value="thriller">ระทึก</option>
-            </select>
-
-            {/* Sort */}
-            <select
-              className="filter-select"
-              value={sortBy}
-              onChange={(e) => handleSort(e.target.value)}
-            >
-              <option value="newest">ใหม่ล่าสุด</option>
-              <option value="rating-high">คะแนนสูง-ต่ำ</option>
-              <option value="rating-low">คะแนนต่ำ-สูง</option>
-            </select>
           </div>
 
           {/* Results count */}

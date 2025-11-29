@@ -1,132 +1,130 @@
-/* ===============================
-   PROFILE PAGE WRAPPER
-================================= */
+/* Container like a card */
 .profile-page {
     max-width: 600px;
     margin: 40px auto;
-    padding: 25px;
-    background: #111;
-    color: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+    padding: 30px;
+    background: #1a1e23;
+    color: #ffffff; /* Light gray text */
+    border-radius: 16px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
     animation: fadeIn 0.4s ease;
     text-align: left;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Smooth intro */
+.profile-page:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+}
+
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* ===============================
-   HEADER
-================================= */
+/* Header */
 .profile-header {
     text-align: center;
-    font-size: 26px;
+    font-size: 28px;
     margin-bottom: 25px;
-    font-weight: bold;
-    border-bottom: 1px solid #333;
-    padding-bottom: 10px;
+    font-weight: 700;
+    color: #fbbf24;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 12px;
 }
 
-/* ===============================
-   PROFILE INFO CARD
-================================= */
+/* Info card */
 .profile-info-card {
-    background: #1a1a1a;
-    border-radius: 10px;
-    padding: 20px;
+    background: #1a1e23;
+    border-radius: 12px;
+    padding: 22px;
     line-height: 1.8;
-    box-shadow: 0 0 8px rgba(255,255,255,0.05) inset;
+    transition: background 0.3s ease;
 }
 
 .profile-info-card strong {
-    color: #ffce45; /* Gold highlight */
+    color: #ffffff; /* Gold accent */
 }
 
-/* ===============================
-   ROLE COLORS
-================================= */
 .role-user {
     color: #4dd0e1;
-    font-weight: bold;
+    font-weight: 600;
 }
 
 .role-admin {
-    color: #ff4747;
-    font-weight: bold;
+    color: #fbbf24;
+    font-weight: 600;
 }
 
-/* ===============================
-   LOGOUT BUTTON
-================================= */
-.logout-btn {
-    margin-top: 25px;
+/* Buttons */
+.logout-btn,
+.admin-btn {
+    margin-top: 20px;
     width: 100%;
     padding: 12px;
     font-size: 16px;
-    background: transparent;
-    color: #ff4747;
-    border: 1px solid #ff4747;
-    border-radius: 8px;
+    border-radius: 12px;
     cursor: pointer;
-    transition: 0.3s;
+    font-weight: 600;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
+}
+
+.logout-btn {
+    background: transparent;
+    color: #ffffff;
+    background: #ff4747;
+    border: 1px solid #ff4747;
 }
 
 .logout-btn:hover {
-    background: #ff4747;
-    color: white;
+    background: #d73737;
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
 }
 
-/* ===============================
-   ADMIN BUTTON
-================================= */
+.admin-btn {
+    background: #fbbf24;
+    color: #ffffff;
+    border: none;
+}
+
+.admin-btn:hover {
+    background: #d69f13;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+}
+
+/* Admin link wrapper */
 .admin-link {
     margin-top: 20px;
     text-align: center;
 }
 
-.admin-btn {
-    padding: 12px 18px;
-    font-size: 16px;
-    background: #ff4747;
-    border: none;
-    border-radius: 8px;
-    color: white;
-    cursor: pointer;
-    transition: 0.3s;
-    width: 100%;
-}
-
-.admin-btn:hover {
-    background: #d73737;
-}
-
-/* ===============================
-   ERROR TEXT
-================================= */
+/* Error messages */
 .error {
     color: #ff4747;
     font-weight: bold;
     text-align: center;
 }
 
-/* ===============================
-   RESPONSIVE
-================================= */
+/* Responsive adjustments */
 @media (max-width: 480px) {
     .profile-page {
-        padding: 18px;
+        padding: 20px;
     }
 
     .profile-info-card {
-        padding: 15px;
+        padding: 16px;
     }
 
-    .logout-btn, .admin-btn {
+    .logout-btn,
+    .admin-btn {
         font-size: 14px;
         padding: 10px;
+    }
+
+    .profile-header {
+        font-size: 24px;
     }
 }

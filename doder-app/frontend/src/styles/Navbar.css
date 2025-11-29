@@ -1,23 +1,159 @@
+/* Navbar.css */
+
+/* --- Existing Navigation Styles --- */
 .nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  z-index: 10000;
   padding: 0.8rem 1.5rem;
   background: linear-gradient(0deg, #410707, #2b0547);
   backdrop-filter: blur(8px);
   box-shadow: 0 1px 6px rgba(0,0,0,0.06);
   gap: 1rem;
 }
-.left { display:flex; align-items:center; gap:1rem; }
+.left { 
+  display:flex; 
+  align-items:center; 
+  gap:1rem; 
+}
 .logo img {
   width: 72px;
   height: auto;
 }
 
-.menu { display:flex; list-style:none; gap:1rem; margin:0; padding:0; }
-.menu a { text-decoration:none; color:#ffffff; padding:0.25rem 0.5rem; }
-.menu a:hover { color:#0077ff; }
-.profile-link { color:#ffffff; display:inline-flex; align-items:center; }
+.menu { 
+  display:flex; 
+  list-style:none; 
+  gap:1rem; 
+  margin:0; 
+  padding:0; 
+}
+.menu a { 
+  text-decoration:none; 
+  color:#ffffff; 
+  padding:0.25rem 0.5rem; 
+}
+.menu a:hover { 
+  color:#fbbf24; 
+}
+
+/* This is the original profile link, kept for compatibility if needed, but the dropdown uses different classes */
+.profile-link { 
+  color:#ffffff; 
+  display:inline-flex; 
+  align-items:center; 
+}
+
 @media (max-width: 640px) {
-  .menu { display:none; } /* you can add responsive menu later */
+  .menu { 
+    display:none; 
+  }
+}
+
+/* --- New Styles for Admin Link and Profile Dropdown --- */
+
+/* Ensure the right container has space between Admin link and profile dropdown */
+.right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+/* New style for the Admin link to match the main menu links (e.g., ภาพยนตร์) */
+.nav-link { 
+  text-decoration: none; 
+  color: #ffffff; 
+  padding: 0.25rem 0.5rem; 
+}
+.nav-link:hover { 
+  color: #fbbf24; 
+}
+
+
+/* Dropdown Container */
+.profile-dropdown-container {
+  position: relative;
+}
+
+/* Profile Icon Button */
+.profile-btn {
+  background: none;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0;
+}
+
+.dropdown-caret {
+  transition: transform 0.2s ease;
+}
+
+/* Dropdown Menu */
+.dropdown-menu {
+  position: absolute;
+  top: 100%; /* Position below the button */
+  right: 0;
+  z-index: 9999;
+  background-color: #1a1e23; /* Dark background */
+  min-width: 180px;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  padding: 0.5rem 0;
+  margin-top: 0.5rem; /* Space between icon and dropdown */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* User Info/Name in Dropdown */
+.dropdown-info {
+  color: #94a3b8; /* Lighter text for info */
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #334155;
+  margin-bottom: 0.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Dropdown Menu Items (Links and Buttons) */
+.dropdown-item {
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 0.5rem 1rem;
+  width: 100%;
+  color: #ffffff;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background-color: #334155;
+  color: #fff;
+}
+
+.login-link {
+  color: #ffffff; /* Blue color for login */
+}
+.login-link:hover {
+  color: #fbbf24;
+}
+/* Logout Button Specific Styling */
+.logout-item {
+  color: #ff5252; /* Red color for logout */
+  margin-top: 0.5rem;
+  border-top: 1px solid #334155;
+}
+
+.logout-item:hover {
+  background-color: #ff5252;
+  color: #fff;
 }

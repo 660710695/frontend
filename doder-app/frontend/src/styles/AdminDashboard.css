@@ -2,8 +2,8 @@
 .admin-container {
   min-height: 100vh;
   padding: 40px 20px;
-  background-color: #121212;
-  color: #f0f0f0;
+  background-color: #f8fafc;
+  color: #000000;
   font-family: 'Segoe UI', Roboto, sans-serif;
   text-align: center;
 }
@@ -11,15 +11,14 @@
 /* Title */
 .admin-title {
   font-size: 2.5rem;
-  color: #ff3b3b;
-  text-shadow: 0 0 10px rgba(255, 59, 59, 0.5);
+  color: #000000;
   margin-bottom: 10px;
 }
 
 /* Subtitle */
 .admin-subtitle {
   font-size: 1.2rem;
-  color: #bdbdbd;
+  color: #000000;
   margin-bottom: 40px;
 }
 
@@ -49,14 +48,14 @@
 /* Card hover */
 .admin-card:hover {
   transform: scale(1.03);
-  border-color: #ff3b3b;
-  box-shadow: 0 0 12px rgba(255,59,59,0.6);
+  border-color: #fbbf24;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
 }
 
 /* Header inside card */
 .admin-card h2 {
   margin-bottom: 8px;
-  color: #ff5454;
+  color: #fbbf24;
   font-size: 1.5rem;
 }
 
