@@ -430,3 +430,109 @@ func (h *SeatHandler) DeleteSeat(c *gin.Context) {
 		Message: "Seat deleted successfully",
 	})
 }
+
+// GetSeatStatusByShowtime ดึงสถานะที่นั่งตาม showtime_id
+// GET /api/showtimes/:id/seats
+func (h *SeatHandler) GetSeatStatusByShowtime(c *gin.Context) {
+	id := c.Param("id")
+	showtimeID, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse{
+			Success: false,
+			Error:   "Invalid showtime ID",
+		})
+		return
+	}
+
+	// ตรวจสอบว่า showtime มีอยู่จริง และดึง theater_id
+	var theaterID int
+	var movieTitle string
+	var cinemaName string
+	var theaterName string
+	var showDate string
+	var showTime string
+	var price float64
+	showtimeQuery := `
+		SELECT s.theater_id, m.title, c.cinema_name, t.theater_name, 
+		       TO_CHAR(s.show_date, 'YYYY-MM-DD'), TO_CHAR(s.show_time, 'HH24:MI'), s.price
+		FROM showtimes s
+		JOIN movies m ON s.movie_id = m.movie_id
+		JOIN theaters t ON s.theater_id = t.theater_id
+		JOIN cinemas c ON t.cinema_id = c.cinema_id
+		WHERE s.showtime_id = $1 AND s.is_active = TRUE
+	`
+	err = h.db.QueryRow(showtimeQuery, showtimeID).Scan(&theaterID, &movieTitle, &cinemaName, &theaterName, &showDate, &showTime, &price)
+	if err == sql.ErrNoRows {
+		c.JSON(http.StatusNotFound, models.ErrorResponse{
+			Success: false,
+			Error:   "Showtime not found",
+		})
+		return
+	}
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Success: false,
+			Error:   "Failed to fetch showtime",
+		})
+		return
+	}
+
+	// ดึงที่นั่งทั้งหมดของ theater พร้อมสถานะจาก seat_status
+	query := `
+		SELECT 
+			s.seat_id, s.seat_row, s.seat_number, s.seat_type,
+			COALESCE(ss.status, 'available') as status
+		FROM seats s
+		LEFT JOIN seat_status ss ON s.seat_id = ss.seat_id AND ss.showtime_id = $1
+		WHERE s.theater_id = $2 AND s.is_active = TRUE
+		ORDER BY s.seat_row, s.seat_number
+	`
+
+	rows, err := h.db.Query(query, showtimeID, theaterID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Success: false,
+			Error:   "Failed to fetch seats",
+		})
+		return
+	}
+	defer rows.Close()
+
+	type SeatWithStatus struct {
+		SeatID     int    `json:"seat_id"`
+		SeatRow    string `json:"seat_row"`
+		SeatNumber int    `json:"seat_number"`
+		SeatType   string `json:"seat_type"`
+		Status     string `json:"status"`
+	}
+
+	seats := []SeatWithStatus{}
+	for rows.Next() {
+		var seat SeatWithStatus
+		err := rows.Scan(
+			&seat.SeatID,
+			&seat.SeatRow,
+			&seat.SeatNumber,
+			&seat.SeatType,
+			&seat.Status,
+		)
+		if err != nil {
+			continue
+		}
+		seats = append(seats, seat)
+	}
+
+	c.JSON(http.StatusOK, models.Response{
+		Success: true,
+		Data: gin.H{
+			"showtime_id":  showtimeID,
+			"movie_title":  movieTitle,
+			"cinema_name":  cinemaName,
+			"theater_name": theaterName,
+			"show_date":    showDate,
+			"show_time":    showTime,
+			"price":        price,
+			"seats":        seats,
+		},
+	})
+}

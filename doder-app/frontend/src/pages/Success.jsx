@@ -5,13 +5,15 @@ function Success() {
   const query = new URLSearchParams(useLocation().search);
   const navigate = useNavigate();
 
-  const movieId = query.get("movie");
-  const cinemaId = query.get("cinema");
+  const bookingId = query.get("booking_id");
+  const bookingCode = query.get("booking_code");
+  const movieTitle = query.get("movie");
+  const cinemaName = query.get("cinema");
+  const theaterName = query.get("theater");
   const date = query.get("date");
   const time = query.get("time");
   const seats = query.get("seats")?.split(",") || [];
   const total = query.get("total");
-  const bookingId = "BOOK" + Date.now(); // สร้าง booking ID
 
   return (
     <div className="success-page">
@@ -33,16 +35,16 @@ function Success() {
           <div className="detail-section">
             <h3>รายละเอียดการจอง</h3>
             <div className="detail-row">
-              <span className="label">หมายเลขการจอง:</span>
-              <span className="value">{bookingId}</span>
+              <span className="label">รหัสการจอง:</span>
+              <span className="value">{bookingCode}</span>
             </div>
             <div className="detail-row">
               <span className="label">หนัง:</span>
-              <span className="value">{movieId}</span>
+              <span className="value">{movieTitle}</span>
             </div>
             <div className="detail-row">
               <span className="label">โรงภาพยนตร์:</span>
-              <span className="value">{cinemaId}</span>
+              <span className="value">{cinemaName} - {theaterName}</span>
             </div>
             <div className="detail-row">
               <span className="label">วันที่:</span>
@@ -65,10 +67,6 @@ function Success() {
               <span className="label">จำนวนที่นั่ง:</span>
               <span className="value">{seats.length} ที่</span>
             </div>
-            <div className="payment-row">
-              <span className="label">ราคา/ที่นั่ง:</span>
-              <span className="value">180 บาท</span>
-            </div>
             <div className="payment-row total-row">
               <span className="label">รวมทั้งหมด:</span>
               <span className="value total-amount">{total} บาท</span>
@@ -83,7 +81,7 @@ function Success() {
         <div className="instructions">
           <h3>คำแนะนำ</h3>
           <ul>
-            <li>โปรดนำหมายเลขการจอง {bookingId} มาแสดงที่หน้าจำหน่ายตั๋ว</li>
+            <li>โปรดนำรหัสการจอง {bookingCode} มาแสดงที่หน้าจำหน่ายตั๋ว</li>
             <li>กรุณามาถึงโรงภาพยนตร์ก่อนเวลาฉายอย่างน้อย 15 นาที</li>
             <li>คุณสามารถตรวจสอบอีเมลเพื่อดูรายละเอียดเพิ่มเติม</li>
           </ul>

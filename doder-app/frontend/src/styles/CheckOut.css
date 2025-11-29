@@ -1,5 +1,7 @@
 .checkout-page {
   padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .summary-box {
@@ -9,11 +11,49 @@
   border-radius: 10px;
 }
 
+.summary-box h3 {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 2px solid #ddd;
+  color: #333;
+}
+
+.error-message {
+  background: #ffebee;
+  color: #c62828;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 15px 0;
+  border: 1px solid #ef9a9a;
+}
+
+.login-notice {
+  background: #fff3e0;
+  color: #e65100;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 15px 0;
+  border: 1px solid #ffcc80;
+}
+
 .pay-btn {
-  padding: 12px 20px;
+  padding: 14px 28px;
   border: none;
   background: #28a745;
   color: white;
   border-radius: 8px;
   cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  transition: background 0.2s ease;
+  width: 100%;
+}
+
+.pay-btn:hover:not(:disabled) {
+  background: #218838;
+}
+
+.pay-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
 }

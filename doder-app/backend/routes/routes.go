@@ -51,6 +51,7 @@ func SetupRoutes(router *gin.Engine, db *sql.DB, cronService *services.CronServi
 		// Showtimes
 		api.GET("/showtimes", showtimeHandler.GetAllShowtimes)
 		api.GET("/showtimes/:id", showtimeHandler.GetShowtimeByID)
+		api.GET("/showtimes/:id/seats", seatHandler.GetSeatStatusByShowtime)
 
 		// Seats
 		api.GET("/seats", seatHandler.GetAllSeats)
