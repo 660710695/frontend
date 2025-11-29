@@ -16,6 +16,18 @@ function CheckOut() {
   const navigate = useNavigate();
 
   const handleConfirm = () => {
+    // บันทึกที่นั่งที่จองแล้วลง localStorage (same key as SeatPicker)
+    try {
+      const bookingsKey = `bookings:${movieId}:${cinemaId}:${date}:${time}`;
+      const raw = localStorage.getItem(bookingsKey);
+      const existing = raw ? JSON.parse(raw) : [];
+      // รวมและกรองที่ซ้ำ
+      const merged = Array.from(new Set([...existing, ...seats]));
+      localStorage.setItem(bookingsKey, JSON.stringify(merged));
+    } catch (e) {
+      console.error("Failed to save bookings to localStorage", e);
+    }
+
     // ส่ง params ไป Success page
     const params = new URLSearchParams({
       movie: movieId,

@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "../styles/SeatPicker.css";
 
 function SeatPicker() {
@@ -13,9 +13,27 @@ function SeatPicker() {
   const cols = 8;
 
   const [selectedSeats, setSelectedSeats] = useState([]);
+  const [bookedSeats, setBookedSeats] = useState([]);
   const navigate = useNavigate();
 
+  // key per showtime
+  const bookingsKey = `bookings:${movieId}:${cinemaId}:${date}:${time}`;
+
+  useEffect(() => {
+    // load booked seats for this showtime from localStorage (or API)
+    try {
+      const raw = localStorage.getItem(bookingsKey);
+      if (raw) setBookedSeats(JSON.parse(raw));
+      else setBookedSeats([]);
+    } catch (e) {
+      setBookedSeats([]);
+    }
+  }, [bookingsKey]);
+
   const toggleSeat = (seat) => {
+    // don't allow toggling a seat that's already booked
+    if (bookedSeats.includes(seat)) return;
+
     setSelectedSeats((prev) =>
       prev.includes(seat)
         ? prev.filter((s) => s !== seat)
@@ -39,12 +57,15 @@ function SeatPicker() {
           Array.from({ length: cols }).map((_, i) => {
             const seat = `${r}${i + 1}`;
             const isSelected = selectedSeats.includes(seat);
+            const isBooked = bookedSeats.includes(seat);
 
             return (
               <div
                 key={seat}
-                className={`seat ${isSelected ? "selected" : ""}`}
+                className={`seat ${isSelected ? "selected" : ""} ${isBooked ? "unavailable" : ""}`}
                 onClick={() => toggleSeat(seat)}
+                title={isBooked ? "ที่นั่งนี้ถูกจองแล้ว" : `เลือก ${seat}`}
+                aria-disabled={isBooked}
               >
                 {seat}
               </div>
@@ -55,6 +76,7 @@ function SeatPicker() {
 
       <button
         className="confirm-btn"
+        disabled={selectedSeats.length === 0}
         onClick={() =>
           navigate(
             `/checkout?movie=${movieId}&cinema=${cinemaId}&date=${date}&time=${time}&seats=${selectedSeats.join(",")}`
