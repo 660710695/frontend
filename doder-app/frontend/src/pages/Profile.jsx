@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext'; // Check this path!
 import { useNavigate } from 'react-router-dom';
 import '../styles/Profile.css'; // Assume you'll create this CSS file
 
-const API_BASE_URL = "http://localhost:8081/api";
+const API_BASE_URL = "/api";
 
 function Profile() {
     // 1. Get user status and logout function from AuthContext

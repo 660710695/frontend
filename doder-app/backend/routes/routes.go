@@ -19,8 +19,12 @@ func SetupRoutes(router *gin.Engine, db *sql.DB, cronService *services.CronServi
 	cronHandler := handlers.NewCronHandler(cronService)
 	uploadHandler := handlers.NewUploadHandler()
 	authHandler := handlers.NewAuthHandler(db)
+	bookingHandler := handlers.NewBookingHandler(db)
+
+	// Middlewares
 	authMiddleware := handlers.AuthMiddleware()
 	adminMiddleware := handlers.AdminMiddleware()
+	bookingMiddleware := handlers.NewBookingMiddleware(db)
 
 	api := router.Group("/api")
 	{
@@ -32,13 +36,11 @@ func SetupRoutes(router *gin.Engine, db *sql.DB, cronService *services.CronServi
 			auth.GET("/profile", authMiddleware, authHandler.GetProfile)
 		}
 
-		// Public
-
-		// Movies
+		//  Movies
 		api.GET("/movies", movieHandler.GetAllMovies)
 		api.GET("/movies/:id", movieHandler.GetMovieByID)
 
-		// Cinemas
+		//  Cinemas
 		api.GET("/cinemas", cinemaHandler.GetAllCinemas)
 		api.GET("/cinemas/:id", cinemaHandler.GetCinemaByID)
 
@@ -54,7 +56,15 @@ func SetupRoutes(router *gin.Engine, db *sql.DB, cronService *services.CronServi
 		api.GET("/seats", seatHandler.GetAllSeats)
 		api.GET("/seats/:id", seatHandler.GetSeatByID)
 
-		// Admin
+		// User Routes Bookings (ต้อง login)
+		bookings := api.Group("/bookings", authMiddleware)
+		{
+			bookings.POST("", bookingHandler.CreateBooking)
+			bookings.GET("/:id", bookingMiddleware.BookingExistsMiddleware(), bookingMiddleware.BookingOwnerMiddleware(), bookingHandler.GetBooking)
+			bookings.DELETE("/:id", bookingMiddleware.BookingExistsMiddleware(), bookingMiddleware.BookingOwnerMiddleware(), bookingHandler.CancelBooking)
+		}
+
+		// Admin Routes
 		admin := api.Group("/admin", authMiddleware, adminMiddleware)
 		{
 			// Movies
@@ -82,6 +92,10 @@ func SetupRoutes(router *gin.Engine, db *sql.DB, cronService *services.CronServi
 			admin.POST("/seats/bulk", seatHandler.CreateSeatsInBulk)
 			admin.PUT("/seats/:id", seatHandler.UpdateSeat)
 			admin.DELETE("/seats/:id", seatHandler.DeleteSeat)
+
+			// Bookings (Admin only)
+			admin.GET("/bookings", bookingHandler.GetAllBookings)
+			admin.GET("/bookings/:id", bookingMiddleware.BookingExistsMiddleware(), bookingHandler.GetBooking)
 
 			// Cron
 			admin.GET("/cron/status", cronHandler.GetCronStatus)

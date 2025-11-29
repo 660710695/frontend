@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Register.css'; // Import CSS for styling
 
-const API_BASE_URL = "http://localhost:8081/api";
+const API_BASE_URL = "/api";
 
 function Register() {
     // State for form inputs (matching models.RegisterRequest in Go backend)
