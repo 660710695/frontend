@@ -1,216 +1,249 @@
+// AdminMovies.jsx
+
 import React, { useState, useEffect } from 'react';
-import '../../styles/AdminMovies.css';
+import { useAuth } from '../../contexts/AuthContext';
+import '../../styles/AdminCommon.css';
 
 const API_BASE_URL = "/api";
 
+const initialMovieState = {
+    title: '',
+    duration: '',
+    genres: '', // comma-separated string for form
+    is_active: true,
+};
+
 function AdminMovies() {
+    const { user, isLoading: isAuthLoading, logout } = useAuth();
+    const isAdmin = user && user.role === 'admin';
+
     const [movies, setMovies] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [status, setStatus] = useState(null);
+    const [newMovie, setNewMovie] = useState(initialMovieState);
+    const [editingMovieId, setEditingMovieId] = useState(null);
 
-    const [newMovie, setNewMovie] = useState({
-        title: '',
-        description: '',
-        duration: 0,
-        language: '',
-        subtitle: '',
-        poster_url: '',
-        release_date: '',
-    });
+    const getToken = () => localStorage.getItem('authToken');
 
-    const [creationStatus, setCreationStatus] = useState(null);
-
-    // --- FETCH ALL MOVIES (READ) ---
+    // --- Fetch all movies ---
     const fetchMovies = async () => {
-        setLoading(true);
-        setError(null);
-
-        const token = localStorage.getItem('authToken');
-        if (!token) {
-            setError("Unauthorized: Please log in again.");
+        if (!isAdmin) {
             setLoading(false);
             return;
         }
 
+        setLoading(true);
+        setStatus(null);
+        const token = getToken();
+        if (!token) return;
+
         try {
             const response = await fetch(`${API_BASE_URL}/movies`, {
-                method: 'GET',
-                headers: {
-                    // FIX 2: Added Authorization Header for fetchMovies
-                    'Authorization': `Bearer ${token}`
-                },
+                headers: { 'Authorization': `Bearer ${token}` },
             });
-
             const data = await response.json();
-
-            // Check if the backend returned an error (e.g., 403 Forbidden because it's in the admin group)
-            if (!response.ok || !data.success) {
-                throw new Error(data.error || "Failed to fetch movie list.");
-            }
-
+            if (!response.ok || !data.success) throw new Error(data.error || "Failed to fetch movies.");
             setMovies(data.data || []);
-
         } catch (err) {
-            // Display the specific error message (e.g., "Admin access required")
-            setError(err.message);
-            console.error("Fetch error:", err);
+            setStatus({ type: 'error', message: `Fetch failed: ${err.message}` });
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchMovies();
-    }, []);
+        if (!isAuthLoading) {
+            if (isAdmin) fetchMovies();
+            else if (user) {
+                setStatus({ type: 'error', message: "Access Denied: Admin privileges required." });
+                setLoading(false);
+            } else {
+                setStatus({ type: 'error', message: "Unauthorized: Please log in." });
+                setLoading(false);
+            }
+        }
+    }, [isAuthLoading, isAdmin]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setNewMovie(prev => ({ ...prev, [name]: value }));
+        setNewMovie(prev => ({ ...prev, [name]: name === 'duration' ? parseInt(value, 10) : value }));
     };
 
+    const handleEditClick = (movie) => {
+    // Check movie.genres instead of movie.genre
+    const genreString = Array.isArray(movie.genres) ? movie.genres.join(', ') : movie.genres; 
+    setNewMovie({
+        title: movie.title,
+        duration: movie.duration,
+        genres: genreString, // 💥 FIX: Use genres 💥
+        is_active: movie.is_active,
+    });
+        setEditingMovieId(movie.movie_id);
+        setStatus(null);
+    };
 
-    // --- CREATE NEW MOVIE (Runs ONLY on form submission) ---
-    // FIX 1: Correctly defined handleCreateMovie function
-    const handleCreateMovie = async (e) => {
+    const handleCancelEdit = () => {
+        setNewMovie(initialMovieState);
+        setEditingMovieId(null);
+        setStatus(null);
+    };
+
+    const handleSubmit = (e) => {
         e.preventDefault();
-        setCreationStatus(null);
+        if (!isAdmin) return;
 
-        const token = localStorage.getItem('authToken');
-        if (!token) {
-            setCreationStatus({ type: 'error', message: "Unauthorized. Please log in as Admin." });
-            return;
-        }
+        editingMovieId ? handleUpdateMovie(editingMovieId) : handleCreateMovie();
+    };
 
-        // 💥 FIX: Prepare the payload and convert duration to number 💥
-        const payload = {
-            ...newMovie,
-            duration: parseInt(newMovie.duration, 10), // Convert string to integer
-            // Ensure total_seats is a number too, if that field exists and uses string input
-            // total_seats: parseInt(newMovie.total_seats, 10), 
-        };
+    const handleCreateMovie = async () => {
+        setStatus(null);
+        const token = getToken();
+        if (!token) return;
 
         try {
+            const payload = {
+                ...newMovie,
+                genres: newMovie.genres.split(',').map(g => g.trim()),
+            };
+
             const response = await fetch(`${API_BASE_URL}/admin/movies`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                // Send the converted payload
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify(payload),
             });
 
             const data = await response.json();
+            if (!response.ok || !data.success) throw new Error(data.error || "Failed to create movie.");
 
-            if (!response.ok || !data.success) {
-                // Display the specific error from Go if conversion fails again, or other error occurs
-                throw new Error(data.error || "Failed to create movie.");
-            }
-
-            setCreationStatus({ type: 'success', message: "Movie created successfully!" });
-            fetchMovies(); // Refresh the list
-
-            // Reset form fields after success
-            setNewMovie({
-                title: '', description: '', duration: 0, language: '',
-                subtitle: '', poster_url: '', release_date: '',
-            });
+            setStatus({ type: 'success', message: "Movie created successfully!" });
+            fetchMovies();
+            setNewMovie(initialMovieState);
 
         } catch (err) {
-            // ... error handling ...
-            setCreationStatus({ type: 'error', message: `Creation failed: ${err.message}` });
+            setStatus({ type: 'error', message: `Creation failed: ${err.message}` });
         }
     };
 
-    // --- DELETE MOVIE (Soft Delete) ---
-    const handleDeleteMovie = async (movieId) => { // FIX 3: Changed function param to movieId for clarity
-        if (!window.confirm("Are you sure you want to deactivate this movie?")) return;
-
-        const token = localStorage.getItem('authToken');
+    const handleUpdateMovie = async (movieId) => {
+        setStatus(null);
+        const token = getToken();
         if (!token) return;
 
         try {
+            const payload = {
+                ...newMovie,
+                genres: newMovie.genres.split(',').map(g => g.trim()),
+            };
+
             const response = await fetch(`${API_BASE_URL}/admin/movies/${movieId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}` // ✅ Token sent
-                }
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify(payload),
             });
 
             const data = await response.json();
+            if (!response.ok || !data.success) throw new Error(data.error || "Failed to update movie.");
 
-            if (!response.ok || !data.success) {
-                throw new Error(data.error || "Failed to delete movie.");
-            }
-
-            setCreationStatus({ type: 'success', message: `Movie ID ${movieId} deactivated.` });
+            setStatus({ type: 'success', message: `Movie ID ${movieId} updated successfully!` });
             fetchMovies();
+            handleCancelEdit();
 
         } catch (err) {
-            setCreationStatus({ type: 'error', message: err.message });
+            setStatus({ type: 'error', message: `Update failed: ${err.message}` });
         }
     };
 
-    if (loading) return <div className="admin-loading">กำลังโหลด...</div>;
+    const handleDeleteMovie = async (movieId, isActive) => {
+        const action = isActive ? 'deactivate' : 'activate';
+        if (!window.confirm(`Are you sure you want to ${action} this movie?`)) return;
 
-    // Display general errors (like initial fetch failure)
-    if (error) return <div className="admin-error">Error: {error}</div>;
+        const token = getToken();
+        if (!token) return;
+
+        try {
+            const method = isActive ? 'DELETE' : 'PUT';
+            const body = isActive ? null : JSON.stringify({ is_active: true });
+            const headers = { 'Authorization': `Bearer ${token}` };
+            if (method === 'PUT') headers['Content-Type'] = 'application/json';
+
+            const response = await fetch(`${API_BASE_URL}/admin/movies/${movieId}`, { method, headers, body });
+            const data = await response.json();
+            if (!response.ok || !data.success) throw new Error(data.error || `Failed to ${action} movie.`);
+
+            setStatus({ type: 'success', message: `Movie ID ${movieId} ${action}d.` });
+            fetchMovies();
+
+        } catch (err) {
+            setStatus({ type: 'error', message: `Operation failed: ${err.message}` });
+        }
+    };
+
+    if (isAuthLoading) return <div className="admin-page">กำลังโหลดการตรวจสอบสิทธิ์...</div>;
+
+    if (!isAdmin) {
+        return (
+            <div className="admin-page">
+                <h1>จัดการภาพยนตร์</h1>
+                <div className="status-error">Access Denied: Admin access required.</div>
+                {user && <button className="secondary" onClick={logout}>ออกจากระบบ</button>}
+            </div>
+        );
+    }
+
+    if (loading) return <div className="admin-page">Loading movie data...</div>;
 
     return (
-        <div className="admin-movies-container">
-            <h1 className="admin-movies-title">🎬 จัดการภาพยนตร์</h1>
+        <div className="admin-page">
+            <h1>จัดการภาพยนตร์</h1>
 
-            {creationStatus && (
-                <div className={`admin-status ${creationStatus.type}`}>
-                    {creationStatus.message}
+            {status && (
+                <div className={status.type === 'error' ? 'status-error' : 'status-success'}>
+                    {status.message}
                 </div>
             )}
 
-            {/* CREATE FORM */}
-            <h2 className="admin-section-title">+ เพิ่มภาพยนตร์ใหม่</h2>
-            <form className="admin-form" onSubmit={handleCreateMovie}>
-                <input type="text" name="title" placeholder="ชื่อเรื่อง" value={newMovie.title} onChange={handleInputChange} required />
+            <h2>{editingMovieId ? `✏️ แก้ไขภาพยนตร์ ID: ${editingMovieId}` : '+ เพิ่มภาพยนตร์ใหม่'}</h2>
+
+            <form className="admin-form" onSubmit={handleSubmit}>
+                <input type="text" name="title" placeholder="ชื่อภาพยนตร์" value={newMovie.title} onChange={handleInputChange} required />
                 <input type="number" name="duration" placeholder="ระยะเวลา (นาที)" value={newMovie.duration} onChange={handleInputChange} required />
-                <input type="text" name="language" placeholder="ภาษา" value={newMovie.language} onChange={handleInputChange} required />
-                <input type="text" name="subtitle" placeholder="คำบรรยาย" value={newMovie.subtitle} onChange={handleInputChange} />
-                <input type="url" name="poster_url" placeholder="Poster URL" value={newMovie.poster_url} onChange={handleInputChange} required />
-                <input type="date" name="release_date" value={newMovie.release_date} onChange={handleInputChange} required />
+                <input type="text" name="genres" placeholder="ประเภท (เช่น Action, Comedy)" value={newMovie.genres} onChange={handleInputChange} required />
 
-                <textarea name="description" placeholder="รายละเอียด/เรื่องย่อ" value={newMovie.description} onChange={handleInputChange} required />
-
-                <button type="submit" className="admin-submit-btn">บันทึกภาพยนตร์</button>
+                <div className="form-actions" style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                    <button type="submit" className="primary">
+                        {editingMovieId ? 'บันทึกการแก้ไข (Update)' : 'บันทึกภาพยนตร์ (Create)'}
+                    </button>
+                    {editingMovieId && <button type="button" className="secondary" onClick={handleCancelEdit}>ยกเลิก</button>}
+                </div>
             </form>
 
-            {/* LIST TABLE */}
-            <h2 className="admin-section-title">รายการภาพยนตร์ทั้งหมด ({movies.length})</h2>
+            <h2>รายการภาพยนตร์ทั้งหมด ({movies.length})</h2>
 
             <table className="admin-table">
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>ชื่อเรื่อง</th>
+                        <th>ชื่อภาพยนตร์</th>
+                        <th>ระยะเวลา</th>
+                        <th>ประเภท</th>
                         <th>สถานะ</th>
                         <th>จัดการ</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {movies.map(movie => (
-                        <tr key={movie.movie_id}>
-                            <td>{movie.movie_id}</td>
-                            <td>{movie.title}</td>
-                            <td className={movie.is_active ? "active" : "inactive"}>
-                                {movie.is_active ? "เปิดใช้งาน" : "ปิดใช้งาน"}
+                    {movies.map(m => (
+                        <tr key={m.movie_id}>
+                            <td>{m.movie_id}</td>
+                            <td>{m.title}</td>
+                            <td>{m.duration} นาที</td>
+                            <td>{Array.isArray(m.genres) ? m.genres.join(', ') : m.genres}</td>
+                            <td className={m.is_active ? 'status-success' : 'status-error'}>
+                                {m.is_active ? 'เปิดใช้งาน' : 'ปิดใช้งาน'}
                             </td>
-                            <td>
-                                <button className="admin-edit-btn" onClick={() => alert(`Edit ${movie.title}`)}>
-                                    แก้ไข
-                                </button>
-                                <button
-                                    className="admin-delete-btn"
-                                    onClick={() => handleDeleteMovie(movie.movie_id)}
-                                    disabled={!movie.is_active}
-                                >
-                                    ปิดใช้งาน
+                            <td style={{ display: 'flex', gap: '5px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                                <button className="primary" onClick={() => handleEditClick(m)}>แก้ไข</button>
+                                <button className={m.is_active ? 'danger' : 'primary'} onClick={() => handleDeleteMovie(m.movie_id, m.is_active)}>
+                                    {m.is_active ? 'ปิดใช้งาน' : 'เปิดใช้งาน'}
                                 </button>
                             </td>
                         </tr>

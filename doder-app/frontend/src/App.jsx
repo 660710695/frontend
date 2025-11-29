@@ -94,6 +94,15 @@ function App() {
             }
           />
 
+          <Route
+            path="/admin/showtimes"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminShowtimes />
+              </ProtectedRoute>
+            }
+          />
+
         </Routes>
       </BrowserRouter>
     </AuthProvider>

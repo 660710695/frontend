@@ -21,12 +21,12 @@ function Movies() {
     async function fetchMovies() {
       try {
         setLoading(true);
-        const response = await fetch(`${API_BASE_URL}/movies`);
-        
+        const response = await fetch(`${API_BASE_URL}/movies?is_active=true`);
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         const data = await response.json();
         const moviesData = data.data || [];
         setMovies(moviesData);
@@ -58,7 +58,9 @@ function Movies() {
       setFilteredMovies(movies);
     } else {
       const filtered = movies.filter(movie =>
-        movie.genre && movie.genre.toLowerCase() === genre.toLowerCase()
+        // 💥 FIX: Check if the movie.genres array includes the selected genre 💥
+        movie.genres && Array.isArray(movie.genres) &&
+        movie.genres.map(g => g.toLowerCase()).includes(genre.toLowerCase())
       );
       setFilteredMovies(filtered);
     }
@@ -197,9 +199,8 @@ function Movies() {
                         <button
                           key={pageNumber}
                           onClick={() => paginate(pageNumber)}
-                          className={`pagination-btn ${
-                            currentPage === pageNumber ? 'active' : ''
-                          }`}
+                          className={`pagination-btn ${currentPage === pageNumber ? 'active' : ''
+                            }`}
                         >
                           {pageNumber}
                         </button>

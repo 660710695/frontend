@@ -1,7 +1,7 @@
 // จะใช้หรือไม่ใช้ก็ได้
 import React, { useState } from 'react';
 import { SearchIcon } from '@heroicons/react/outline';
-import './SearchBar.css';
+import '../styles/SearchBar.css';
 
 export default function SearchBar({ onSearch, placeholder = 'ค้นหาหนัง...' }) {
   const [searchTerm, setSearchTerm] = useState('');

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { HomeIcon, BookOpenIcon } from '@heroicons/react/outline';
-import './NotFound.css';
+import '../styles/NotFound.css';
 
 const NotFound = () => {
   return (

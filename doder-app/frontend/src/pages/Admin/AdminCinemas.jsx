@@ -1,34 +1,37 @@
-// AdminCinemas.jsx (Finalized with Navigation to AdminTheaters)
+// AdminCinemas.jsx
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // 💥 NEW IMPORT 💥
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+import '../../styles/AdminCommon.css'; // ✅ Import CSS
 
 const API_BASE_URL = "/api";
 
+const initialCinemaState = {
+    cinema_name: '',
+    address: '',
+    city: '',
+};
+
 function AdminCinemas() {
+    const { user, isLoading: isAuthLoading, logout } = useAuth();
+    const isAdmin = user && user.role === 'admin';
+    const navigate = useNavigate();
+
     const [cinemas, setCinemas] = useState([]);
     const [loading, setLoading] = useState(true);
     const [status, setStatus] = useState(null);
-    const navigate = useNavigate(); // 💥 Initialize useNavigate 💥
+    const [newCinema, setNewCinema] = useState(initialCinemaState);
+    const [editingCinemaId, setEditingCinemaId] = useState(null);
 
-    // State for the Create Form
-    const [newCinema, setNewCinema] = useState({
-        cinema_name: '',
-        address: '',
-        city: '',
-    });
+    const getToken = () => localStorage.getItem('authToken');
 
-    // Function to get token (to reduce repetitive code)
-    const getToken = () => {
-        const token = localStorage.getItem('authToken');
-        if (!token) {
-            setStatus({ type: 'error', message: "Unauthorized. Please log in as Admin." });
-        }
-        return token;
-    };
-
-    // --- FETCH ALL CINEMAS (READ) ---
     const fetchCinemas = async () => {
+        if (!isAdmin) {
+            setLoading(false);
+            return;
+        }
+
         setLoading(true);
         setStatus(null);
         const token = getToken();
@@ -39,9 +42,9 @@ function AdminCinemas() {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
-            if (!response.ok) throw new Error("Failed to fetch cinema list.");
-
             const data = await response.json();
+            if (!response.ok || !data.success) throw new Error(data.error || "Failed to fetch cinema list.");
+
             setCinemas(data.data || []);
         } catch (err) {
             setStatus({ type: 'error', message: `Fetch failed: ${err.message}` });
@@ -51,109 +54,190 @@ function AdminCinemas() {
     };
 
     useEffect(() => {
-        fetchCinemas();
-    }, []);
+        if (!isAuthLoading) {
+            if (isAdmin) fetchCinemas();
+            else if (user) {
+                setStatus({ type: 'error', message: "Access Denied: Admin privileges required." }); 
+                setLoading(false);
+            } else {
+                setStatus({ type: 'error', message: "Unauthorized: Please log in." }); 
+                setLoading(false);
+            }
+        }
+    }, [isAuthLoading, isAdmin]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setNewCinema(prev => ({ ...prev, [name]: value }));
     };
-    // Note: You must update handleCreateCinema to use getToken() for simplicity
-    const handleCreateCinema = async (e) => {
-        e.preventDefault();
-        setStatus(null);
 
-        const token = getToken(); // Use the helper function to get the token
+    const handleEditClick = (cinema) => {
+        setNewCinema({
+            cinema_name: cinema.cinema_name,
+            address: cinema.address,
+            city: cinema.city,
+        });
+        setEditingCinemaId(cinema.cinema_id);
+        setStatus(null);
+    };
+
+    const handleCancelEdit = () => {
+        setNewCinema(initialCinemaState);
+        setEditingCinemaId(null);
+        setStatus(null);
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (!isAdmin) return;
+
+        editingCinemaId ? handleUpdateCinema(editingCinemaId) : handleCreateCinema();
+    };
+
+    const handleCreateCinema = async () => {
+        setStatus(null);
+        const token = getToken();
         if (!token) return;
 
         try {
             const response = await fetch(`${API_BASE_URL}/admin/cinemas`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}` // Send token for Admin access
-                },
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify(newCinema),
             });
 
             const data = await response.json();
-
-            if (!response.ok || !data.success) {
-                throw new Error(data.error || "Failed to create cinema.");
-            }
+            if (!response.ok || !data.success) throw new Error(data.error || "Failed to create cinema.");
 
             setStatus({ type: 'success', message: "Cinema created successfully!" });
-            fetchCinemas(); // Refresh the list
-            setNewCinema({ cinema_name: '', address: '', city: '' }); // Reset form
+            fetchCinemas();
+            setNewCinema(initialCinemaState);
 
         } catch (err) {
             setStatus({ type: 'error', message: `Creation failed: ${err.message}` });
         }
     };
-    // --- DELETE CINEMA (Soft Delete) ---
-    const handleDeleteCinema = async (cinemaId) => {
-        if (!window.confirm("Are you sure you want to deactivate this cinema? This affects all theaters inside.")) return;
 
+    const handleUpdateCinema = async (cinemaId) => {
+        setStatus(null);
         const token = getToken();
         if (!token) return;
 
         try {
             const response = await fetch(`${API_BASE_URL}/admin/cinemas/${cinemaId}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify(newCinema),
             });
 
-            if (!response.ok) throw new Error("Failed to delete cinema.");
+            const data = await response.json();
+            if (!response.ok || !data.success) throw new Error(data.error || "Failed to update cinema.");
 
-            setStatus({ type: 'success', message: `Cinema ID ${cinemaId} deactivated.` });
+            setStatus({ type: 'success', message: `Cinema ID ${cinemaId} updated successfully!` });
             fetchCinemas();
+            handleCancelEdit();
 
         } catch (err) {
-            setStatus({ type: 'error', message: `Deletion failed: ${err.message}` });
+            setStatus({ type: 'error', message: `Update failed: ${err.message}` });
         }
     };
 
-    // 💥 NEW NAVIGATION HANDLER 💥
+    const handleDeleteCinema = async (cinemaId, isActive) => {
+        const action = isActive ? 'deactivate' : 'activate';
+        if (!window.confirm(`Are you sure you want to ${action} this cinema?`)) return;
+
+        const token = getToken();
+        if (!token) return;
+
+        try {
+            const method = isActive ? 'DELETE' : 'PUT';
+            const body = isActive ? null : JSON.stringify({ is_active: true });
+            const headers = { 'Authorization': `Bearer ${token}` };
+            if (method === 'PUT') headers['Content-Type'] = 'application/json';
+
+            const response = await fetch(`${API_BASE_URL}/admin/cinemas/${cinemaId}`, { method, headers, body });
+            const data = await response.json();
+            if (!response.ok || !data.success) throw new Error(data.error || `Failed to ${action} cinema.`);
+
+            setStatus({ type: 'success', message: `Cinema ID ${cinemaId} ${action}d.` });
+            fetchCinemas();
+
+        } catch (err) {
+            setStatus({ type: 'error', message: `Operation failed: ${err.message}` });
+        }
+    };
+
     const handleManageTheaters = (cinemaId) => {
         navigate(`/admin/theaters?cinema_id=${cinemaId}`);
     };
 
+    if (isAuthLoading) return <div className="admin-page">กำลังโหลดการตรวจสอบสิทธิ์...</div>;
 
-    if (loading) return <div>Loading cinema management data...</div>;
+    if (!isAdmin) {
+        return (
+            <div className="admin-page">
+                <h1>จัดการโรงภาพยนตร์</h1>
+                <div className="status-error">Access Denied: You must be logged in as an administrator to manage cinemas.</div>
+                {user && <button className="secondary" onClick={logout}>ออกจากระบบ</button>}
+            </div>
+        );
+    }
 
-    // ... (rest of the component JSX) ...
+    if (loading) return <div className="admin-page">Loading cinema management data...</div>;
 
     return (
         <div className="admin-page">
             <h1>จัดการโรงภาพยนตร์</h1>
 
-            {/* ... (Status and Form JSX) ... */}
+            {status && (
+                <div className={status.type === 'error' ? 'status-error' : 'status-success'}>
+                    {status.message}
+                </div>
+            )}
 
-            <h2 style={{ marginTop: '40px' }}>รายการโรงภาพยนตร์ทั้งหมด ({cinemas.length})</h2>
+            <h2>{editingCinemaId ? `✏️ แก้ไขโรงภาพยนตร์ ID: ${editingCinemaId}` : '+ เพิ่มโรงภาพยนตร์ใหม่'}</h2>
 
-            {/* --- READ/LIST CINEMAS TABLE --- */}
-            <table>
-                {/* ... (Table Header JSX) ... */}
+            <form className="admin-form" onSubmit={handleSubmit}>
+                <input type="text" name="cinema_name" placeholder="ชื่อโรงภาพยนตร์" value={newCinema.cinema_name} onChange={handleInputChange} required />
+                <input type="text" name="city" placeholder="จังหวัด" value={newCinema.city} onChange={handleInputChange} required />
+                <input type="text" name="address" placeholder="ที่อยู่" value={newCinema.address} onChange={handleInputChange} required />
+
+                <div className="form-actions" style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                    <button type="submit" className="primary">
+                        {editingCinemaId ? 'บันทึกการแก้ไข (Update)' : 'บันทึกโรงภาพยนตร์ (Create)'}
+                    </button>
+                    {editingCinemaId && <button type="button" className="secondary" onClick={handleCancelEdit}>ยกเลิก</button>}
+                </div>
+            </form>
+
+            <h2>รายการโรงภาพยนตร์ทั้งหมด ({cinemas.length})</h2>
+
+            <table className="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>ชื่อโรง</th>
+                        <th>จังหวัด</th>
+                        <th>ที่อยู่</th>
+                        <th>สถานะ</th>
+                        <th>จัดการ</th>
+                    </tr>
+                </thead>
                 <tbody>
                     {cinemas.map(c => (
                         <tr key={c.cinema_id}>
                             <td>{c.cinema_id}</td>
                             <td>{c.cinema_name}</td>
                             <td>{c.city}</td>
-                            <td style={{ color: c.is_active ? 'green' : 'red' }}>
+                            <td>{c.address}</td>
+                            <td className={c.is_active ? 'status-success' : 'status-error'}>
                                 {c.is_active ? 'เปิดใช้งาน' : 'ปิดใช้งาน'}
                             </td>
-                            <td>
-                                {/* 💥 NAVIGATION BUTTON 💥 */}
-                                <button
-                                    onClick={() => handleManageTheaters(c.cinema_id)}
-                                    style={{ marginRight: '10px' }}
-                                >
-                                    จัดการห้องฉาย
-                                </button>
-
-                                <button onClick={() => handleDeleteCinema(c.cinema_id)} disabled={!c.is_active}>
-                                    ปิดใช้งาน
+                            <td style={{ display: 'flex', gap: '5px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                                <button className="info" onClick={() => handleManageTheaters(c.cinema_id)}>จัดการห้องฉาย</button>
+                                <button className="primary" onClick={() => handleEditClick(c)}>แก้ไข</button>
+                                <button className={c.is_active ? 'danger' : 'primary'} onClick={() => handleDeleteCinema(c.cinema_id, c.is_active)}>
+                                    {c.is_active ? 'ปิดใช้งาน' : 'เปิดใช้งาน'}
                                 </button>
                             </td>
                         </tr>

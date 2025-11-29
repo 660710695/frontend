@@ -1,39 +1,41 @@
-// AdminTheaters.jsx (Finalized with Query Param Reading)
+// AdminTheaters.jsx
 
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom'; // 💥 REQUIRED IMPORT 💥
-import { useNavigate } from 'react-router-dom'; // 💥 NEW IMPORT 💥
+import { useAuth } from '../../contexts/AuthContext';
+import { useLocation, useNavigate } from 'react-router-dom';
+import '../../styles/AdminCommon.css';
 
 const API_BASE_URL = "/api";
 
+const initialTheaterState = {
+    theater_name: '',
+    total_seats: '',
+    cinema_id: '',
+    theater_type: 'Standard',
+};
+
 function AdminTheaters() {
-    // 💥 Read the cinema_id from the URL query parameters 💥
-    const query = new URLSearchParams(useLocation().search);
-    const inputCinemaId = Number(query.get("cinema_id")) || 0; // Set default to 0 for validation
+    const { user, isLoading: isAuthLoading, logout } = useAuth();
+    const isAdmin = user?.role === 'admin';
+    const location = useLocation();
+    const params = new URLSearchParams(location.search);
+    const cinemaIdFromParams = params.get('cinema_id');
 
     const [theaters, setTheaters] = useState([]);
+    const [allCinemas, setAllCinemas] = useState([]);
     const [loading, setLoading] = useState(true);
     const [status, setStatus] = useState(null);
-    const navigate = useNavigate(); // 💥 Initialize useNavigate 💥
-    // State for Create Form (Cinema ID is now included via the URL parameter)
-    const [newTheater, setNewTheater] = useState({
-        theater_name: '',
-        total_seats: 0,
-        theater_type: 'Standard',
-    });
+    const [newTheater, setNewTheater] = useState(initialTheaterState);
+    const [editingTheaterId, setEditingTheaterId] = useState(null);
+    const navigate = useNavigate();
+    const getToken = () => localStorage.getItem('authToken');
 
-    // Function to get token
-    const getToken = () => {
-        const token = localStorage.getItem('authToken');
-        if (!token) {
-            setStatus({ type: 'error', message: "Unauthorized. Please log in as Admin." });
+    // --- Fetch theaters and cinemas ---
+    const fetchData = async () => {
+        if (!isAdmin) {
+            setLoading(false);
+            return;
         }
-        return token;
-    };
-
-    // --- FETCH THEATERS FOR THE SELECTED CINEMA (READ) ---
-    const fetchTheaters = async () => {
-        if (inputCinemaId === 0) return;
 
         setLoading(true);
         setStatus(null);
@@ -41,16 +43,18 @@ function AdminTheaters() {
         if (!token) return;
 
         try {
-            // Fetch theaters filtered by cinema_id
-            const response = await fetch(`${API_BASE_URL}/theaters?cinema_id=${inputCinemaId}`, {
-                // 💥 FIX: ADD AUTHORIZATION HEADER HERE 💥
-                headers: { 'Authorization': `Bearer ${token}` }
+            const cinemasRes = await fetch(`${API_BASE_URL}/cinemas`, {
+                headers: { 'Authorization': `Bearer ${token}` },
             });
+            const cinemasData = await cinemasRes.json();
+            setAllCinemas(cinemasData.data || []);
 
-            if (!response.ok) throw new Error("Failed to fetch theater list.");
-
-            const data = await response.json();
-            setTheaters(data.data || []);
+            const theatersRes = await fetch(
+                `${API_BASE_URL}/theaters${cinemaIdFromParams ? `?cinema_id=${cinemaIdFromParams}` : ''}`,
+                { headers: { 'Authorization': `Bearer ${token}` } }
+            );
+            const theatersData = await theatersRes.json();
+            setTheaters(theatersData.data || []);
         } catch (err) {
             setStatus({ type: 'error', message: `Fetch failed: ${err.message}` });
         } finally {
@@ -59,123 +63,202 @@ function AdminTheaters() {
     };
 
     useEffect(() => {
-        if (inputCinemaId > 0) {
-            fetchTheaters();
+        if (!isAuthLoading) {
+            if (isAdmin) fetchData();
+            else setLoading(false);
         }
-    }, [inputCinemaId]); // Re-fetch if the cinema ID changes
+    }, [isAuthLoading, isAdmin, cinemaIdFromParams]);
 
+    // --- Handlers ---
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setNewTheater(prev => ({ ...prev, [name]: value }));
     };
-    // Note: You must update handleCreateTheater and handleDeleteTheater to use getToken()
 
-    // --- CREATE NEW THEATER ---
-    const handleCreateTheater = async (e) => {
-        e.preventDefault();
+    const handleEditClick = (theater) => {
+        setNewTheater({
+            theater_name: theater.theater_name,
+            total_seats: theater.total_seats,
+            cinema_id: String(theater.cinema_id),
+        });
+        setEditingTheaterId(theater.theater_id);
         setStatus(null);
+    };
 
+    const handleCancelEdit = () => {
+        setNewTheater(initialTheaterState);
+        setEditingTheaterId(null);
+        setStatus(null);
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (!isAdmin) return;
+
+        editingTheaterId ? handleUpdateTheater(editingTheaterId) : handleCreateTheater();
+    };
+
+    const handleCreateTheater = async () => {
+        setStatus(null);
         const token = getToken();
         if (!token) return;
 
-        // 💥 Prepare payload with the mandatory cinema_id from the URL 💥
-        const theaterData = {
-            ...newTheater,
-            cinema_id: inputCinemaId,
-            total_seats: parseInt(newTheater.total_seats, 10) // Ensure total_seats is int
-        };
+        if (!newTheater.theater_name || !newTheater.total_seats || !newTheater.cinema_id) {
+            setStatus({ type: 'error', message: "กรุณากรอกข้อมูลให้ครบทุกช่อง" });
+            return;
+        }
 
         try {
-            const response = await fetch(`${API_BASE_URL}/admin/theaters`, {
+            const payload = {
+                ...newTheater,
+                total_seats: parseInt(newTheater.total_seats, 10),
+                cinema_id: parseInt(newTheater.cinema_id, 10),
+            };
+
+            const res = await fetch(`${API_BASE_URL}/admin/theaters`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(theaterData),
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify(payload),
             });
 
-            const data = await response.json();
+            const data = await res.json();
+            if (!res.ok || !data.success) throw new Error(data.error || "Failed to create theater.");
 
-            if (!response.ok || !data.success) {
-                // Display the specific error from Go if conversion fails again, or other error occurs
-                throw new Error(data.error || "Failed to create movie.");
-            }
+            setStatus({ type: 'success', message: `สร้างห้องฉายเรียบร้อย! ID: ${data.data.theater_id}` });
+            fetchData();
+            setNewTheater(initialTheaterState);
 
-            setStatus({ type: 'success', message: "Theater created successfully!" });
-            fetchTheaters(); // Refresh the list
-
-            // 💥 FIX: Use setNewTheater to reset the form state 💥
-            setNewTheater({ // Reset form
-                theater_name: '',
-                total_seats: 0,
-                theater_type: 'Standard',
-            });
         } catch (err) {
-            setStatus({ type: 'error', message: `Creation failed: ${err.message}` });
+            setStatus({ type: 'error', message: `เกิดข้อผิดพลาด: ${err.message}` });
         }
     };
 
-    const handleDeleteTheater = async (theaterId) => {
-        if (!window.confirm("Are you sure you want to deactivate this theater?")) return;
+    const handleUpdateTheater = async (theaterId) => {
+        setStatus(null);
+        const token = getToken();
+        if (!token) return;
+
+        try {
+            const payload = {
+                ...newTheater,
+                total_seats: parseInt(newTheater.total_seats, 10),
+                cinema_id: parseInt(newTheater.cinema_id, 10),
+            };
+
+            const res = await fetch(`${API_BASE_URL}/admin/theaters/${theaterId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify(payload),
+            });
+
+            const data = await res.json();
+            if (!res.ok || !data.success) throw new Error(data.error || "Update failed.");
+
+            setStatus({ type: 'success', message: `อัปเดตห้องฉาย ID ${theaterId} เรียบร้อย` });
+            fetchData();
+            handleCancelEdit();
+
+        } catch (err) {
+            setStatus({ type: 'error', message: `เกิดข้อผิดพลาด: ${err.message}` });
+        }
+    };
+
+    const handleDeleteTheater = async (theaterId, isActive) => {
+        const action = isActive ? 'ปิดใช้งาน' : 'เปิดใช้งาน';
+        if (!window.confirm(`คุณแน่ใจหรือไม่ว่าจะ${action}ห้องฉายนี้?`)) return;
 
         const token = getToken();
         if (!token) return;
 
         try {
-            const response = await fetch(`${API_BASE_URL}/admin/theaters/${theaterId}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const method = isActive ? 'DELETE' : 'PUT';
+            const body = isActive ? null : JSON.stringify({ is_active: true });
+            const headers = { 'Authorization': `Bearer ${token}` };
+            if (method === 'PUT') headers['Content-Type'] = 'application/json';
 
-            if (!response.ok) throw new Error("Failed to delete theater.");
+            const res = await fetch(`${API_BASE_URL}/admin/theaters/${theaterId}`, { method, headers, body });
+            const data = await res.json();
+            if (!res.ok || !data.success) throw new Error(data.error || `Failed to ${action} theater.`);
 
-            setStatus({ type: 'success', message: `Theater ID ${theaterId} deactivated.` });
-            fetchTheaters();
+            setStatus({ type: 'success', message: `ห้องฉาย ID ${theaterId} ${action}เรียบร้อย` });
+            fetchData();
 
         } catch (err) {
-            setStatus({ type: 'error', message: `Deletion failed: ${err.message}` });
+            setStatus({ type: 'error', message: `เกิดข้อผิดพลาด: ${err.message}` });
         }
     };
 
-    if (inputCinemaId === 0) return <div>🚫 Error: Cinema ID is missing. Please navigate from the Cinema Management page.</div>;
-    if (loading) return <div>Loading theaters for Cinema ID {inputCinemaId}...</div>;
-
-    // AdminTheaters.jsx (Partial return block)
+    // --- Render ---
+    if (isAuthLoading) return <div className="admin-loading">กำลังโหลด...</div>;
+    if (!isAdmin) return (
+        <div className="admin-page">
+            <h1>จัดการห้องฉาย</h1>
+            <div className="status-error">Access Denied: Admin access required.</div>
+            {user && <button className="secondary" onClick={logout}>ออกจากระบบ</button>}
+        </div>
+    );
+    if (loading) return <div className="admin-loading">Loading theater data...</div>;
 
     return (
         <div className="admin-page">
-            <h1>จัดการห้องฉาย (Cinema ID: {inputCinemaId})</h1>
+            <h1>จัดการห้องฉาย</h1>
 
-            {status && (
-                <p style={{ color: status.type === 'error' ? 'red' : 'green' }}>
-                    {status.message}
-                </p>
-            )}
+            {status && <div className={status.type === 'error' ? 'status-error' : 'status-success'}>{status.message}</div>}
 
-            {/* --- CREATE NEW THEATER FORM (RESTORED) --- */}
-            <h2>+ เพิ่มห้องฉายใหม่</h2>
-            <form onSubmit={handleCreateTheater} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '10px' }}>
-                <input type="text" name="theater_name" placeholder="ชื่อห้องฉาย (A1, IMAX)" value={newTheater.theater_name} onChange={handleInputChange} required />
-                <input type="number" name="total_seats" placeholder="จำนวนที่นั่งรวม" value={newTheater.total_seats} onChange={handleInputChange} required />
-                <select name="theater_type" value={newTheater.theater_type} onChange={handleInputChange}>
+            <h2>{editingTheaterId ? `✏️ แก้ไขห้องฉาย ID: ${editingTheaterId}` : '+ เพิ่มห้องฉายใหม่'}</h2>
+
+            <form className="admin-form" onSubmit={handleSubmit}>
+                <input
+                    type="text"
+                    name="theater_name"
+                    placeholder="ชื่อห้องฉาย"
+                    value={newTheater.theater_name}
+                    onChange={handleInputChange}
+                    required
+                />
+                <input
+                    type="number"
+                    name="total_seats"
+                    placeholder="จำนวนที่นั่ง"
+                    value={newTheater.total_seats}
+                    onChange={handleInputChange}
+                    required
+                />
+                <select name="cinema_id" value={newTheater.cinema_id} onChange={handleInputChange} required>
+                    <option value="">เลือกโรงภาพยนตร์</option>
+                    {allCinemas.map(c => (
+                        <option key={c.cinema_id} value={String(c.cinema_id)}>{c.cinema_name}</option>
+                    ))}
+                </select>
+                
+                {/* 💥 CRITICAL FIX: ADD THEATER TYPE SELECT 💥 */}
+                <select 
+                    name="theater_type" 
+                    value={newTheater.theater_type} 
+                    onChange={handleInputChange}
+                    required
+                >
                     <option value="Standard">Standard</option>
                     <option value="IMAX">IMAX</option>
                     <option value="VIP">VIP</option>
+                    <option value="4DX">4DX</option>
                 </select>
-                <button type="submit">บันทึกห้องฉาย</button>
+
+                <div className="form-actions">
+                    <button type="submit" className="primary">{editingTheaterId ? 'บันทึกการแก้ไข' : 'บันทึกห้องฉาย'}</button>
+                    {editingTheaterId && <button type="button" className="secondary" onClick={handleCancelEdit}>ยกเลิก</button>}
+                </div>
             </form>
 
-            <h2 style={{ marginTop: '40px' }}>รายการห้องฉายทั้งหมด ({theaters.length})</h2>
+            <h2>รายการห้องฉายทั้งหมด ({theaters.length})</h2>
 
-            {/* --- READ/LIST THEATERS TABLE (RESTORED) --- */}
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <table className="admin-table">
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>ชื่อห้อง</th>
-                        <th>ประเภท</th>
-                        <th>ที่นั่งรวม</th>
+                        <th>ชื่อห้องฉาย</th>
+                        <th>จำนวนที่นั่ง</th>
+                        <th>โรงภาพยนตร์</th>
                         <th>สถานะ</th>
                         <th>จัดการ</th>
                     </tr>
@@ -185,20 +268,18 @@ function AdminTheaters() {
                         <tr key={t.theater_id}>
                             <td>{t.theater_id}</td>
                             <td>{t.theater_name}</td>
-                            <td>{t.theater_type}</td>
                             <td>{t.total_seats}</td>
-                            <td style={{ color: t.is_active ? 'green' : 'red' }}>
+                            <td>{t.cinema_name || t.cinema_id}</td>
+                            <td className={t.is_active ? 'status-success' : 'status-error'}>
                                 {t.is_active ? 'เปิดใช้งาน' : 'ปิดใช้งาน'}
                             </td>
-                            <td>
-                                <button
-                                    // OLD: onClick={() => alert(`Seats for Theater ID ${t.theater_id}`)} 
-                                    onClick={() => navigate(`/admin/seats?theater_id=${t.theater_id}`)}
-                                    style={{ marginRight: '10px' }}>
-                                    จัดการที่นั่ง
+                            <td style={{ display: 'flex', gap: '5px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                                <button className="primary" onClick={() => handleEditClick(t)}>แก้ไข</button>
+                                <button className={t.is_active ? 'danger' : 'primary'} onClick={() => handleDeleteTheater(t.theater_id, t.is_active)}>
+                                    {t.is_active ? 'ปิดใช้งาน' : 'เปิดใช้งาน'}
                                 </button>
-                                <button onClick={() => handleDeleteTheater(t.theater_id)} disabled={!t.is_active}>
-                                    ปิดใช้งาน
+                                <button className="secondary" onClick={() => navigate(`/admin/seats?theater_id=${t.theater_id}`)}>
+                                    จัดการที่นั่ง
                                 </button>
                             </td>
                         </tr>
