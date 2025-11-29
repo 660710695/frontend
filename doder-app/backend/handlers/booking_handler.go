@@ -61,6 +61,25 @@ func (h *BookingHandler) CreateBooking(c *gin.Context) {
 		return
 	}
 
+	// ตรวจสอบว่าผู้ใช้จองที่นั่งเดียวกันซ้ำหลังจากคอนเฟิร์มแล้วหรือไม่
+	userID := c.GetInt("user_id")
+	for _, seatID := range req.SeatIDs {
+		var confirmedCount int
+		confirmedQuery := `
+			SELECT COUNT(*) FROM booking_seats bs
+			JOIN bookings b ON bs.booking_id = b.booking_id
+			WHERE b.user_id = $1 AND b.showtime_id = $2 AND bs.seat_id = $3 AND b.booking_status = 'confirmed'
+		`
+		err := h.db.QueryRow(confirmedQuery, userID, req.ShowtimeID, seatID).Scan(&confirmedCount)
+		if err == nil && confirmedCount > 0 {
+			c.JSON(http.StatusBadRequest, models.ErrorResponse{
+				Success: false,
+				Error:   fmt.Sprintf("You have already confirmed booking for seat %d in this showtime", seatID),
+			})
+			return
+		}
+	}
+
 	// สร้าง booking code
 	bookingCode := fmt.Sprintf("BK%d%d", 1, time.Now().Unix())
 
@@ -83,7 +102,7 @@ func (h *BookingHandler) CreateBooking(c *gin.Context) {
 		VALUES ($1, $2, $3, $4, 'pending', 'pending')
 		RETURNING booking_id
 	`
-	err = tx.QueryRow(bookingQuery, 1, req.ShowtimeID, totalAmount, bookingCode).Scan(&bookingID)
+	err = tx.QueryRow(bookingQuery, userID, req.ShowtimeID, totalAmount, bookingCode).Scan(&bookingID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
 			Success: false,
@@ -94,14 +113,30 @@ func (h *BookingHandler) CreateBooking(c *gin.Context) {
 
 	// เพิ่ม booking seats
 	for _, seatID := range req.SeatIDs {
-		// ตรวจสอบว่าที่นั่งว่างหรือไม่
-		var status string
-		seatStatusQuery := "SELECT status FROM seat_status WHERE showtime_id = $1 AND seat_id = $2"
-		err := tx.QueryRow(seatStatusQuery, req.ShowtimeID, seatID).Scan(&status)
-		if err == nil && status != "available" {
+		// ตรวจสอบว่าที่นั่งถูกจองและยืนยันแล้วหรือไม่ (confirmed booking)
+		var confirmedBookingCount int
+		confirmedSeatQuery := `
+			SELECT COUNT(*) FROM booking_seats bs
+			JOIN bookings b ON bs.booking_id = b.booking_id
+			WHERE b.showtime_id = $1 AND bs.seat_id = $2 AND b.booking_status = 'confirmed'
+		`
+		err := tx.QueryRow(confirmedSeatQuery, req.ShowtimeID, seatID).Scan(&confirmedBookingCount)
+		if err == nil && confirmedBookingCount > 0 {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse{
 				Success: false,
-				Error:   fmt.Sprintf("Seat %d is not available", seatID),
+				Error:   fmt.Sprintf("Seat %d has already been booked and confirmed", seatID),
+			})
+			return
+		}
+
+		// ตรวจสอบว่าที่นั่งว่างหรือไม่ (seat_status)
+		var status string
+		seatStatusQuery := "SELECT status FROM seat_status WHERE showtime_id = $1 AND seat_id = $2"
+		err = tx.QueryRow(seatStatusQuery, req.ShowtimeID, seatID).Scan(&status)
+		if err == nil && status == "booked" {
+			c.JSON(http.StatusBadRequest, models.ErrorResponse{
+				Success: false,
+				Error:   fmt.Sprintf("Seat %d is already booked", seatID),
 			})
 			return
 		}
@@ -480,6 +515,18 @@ func (h *BookingHandler) ConfirmPayment(c *gin.Context) {
 		return
 	}
 
+	// อัปเดต seat_status เป็น 'booked' สำหรับที่นั่งทั้งหมดในการจองนี้
+	updateSeatStatusQuery := `
+		UPDATE seat_status 
+		SET status = 'booked', reserved_until = NULL
+		WHERE booking_id = $1
+	`
+	_, err = h.db.Exec(updateSeatStatusQuery, bookingID)
+	if err != nil {
+		// Log error but don't fail the request since booking is already confirmed
+		fmt.Printf("Warning: Failed to update seat status for booking %d: %v\n", bookingID, err)
+	}
+
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Payment confirmed successfully",
@@ -507,7 +554,7 @@ func (h *BookingHandler) GetUserBookings(c *gin.Context) {
 		JOIN movies m ON s.movie_id = m.movie_id
 		JOIN theaters t ON s.theater_id = t.theater_id
 		JOIN cinemas c ON t.cinema_id = c.cinema_id
-		WHERE b.user_id = $1
+		WHERE b.user_id = $1 AND b.booking_status IN ('pending', 'confirmed')
 		ORDER BY b.booking_date DESC
 	`
 
@@ -521,17 +568,87 @@ func (h *BookingHandler) GetUserBookings(c *gin.Context) {
 	}
 	defer rows.Close()
 
-	bookings := []models.Booking{}
+	bookingsMap := make(map[int]*models.BookingWithDetails)
+
 	for rows.Next() {
-		var booking models.Booking
+		var bookingID int
+		var bookingCode string
+		var userID int
+		var showtimeID int
+		var movieTitle string
+		var cinemaName string
+		var theaterName string
+		var showDate sql.NullTime
+		var showTime sql.NullString
+		var totalAmount float64
+		var bookingStatus string
+		var paymentStatus string
+		var bookingDate sql.NullTime
+
 		err := rows.Scan(
-			&booking.BookingID, &booking.BookingCode, &booking.UserID, &booking.ShowtimeID,
-			&booking.TotalAmount, &booking.BookingStatus, &booking.PaymentStatus, &booking.BookingDate,
+			&bookingID, &bookingCode, &userID, &showtimeID,
+			&movieTitle, &cinemaName, &theaterName,
+			&showDate, &showTime,
+			&totalAmount, &bookingStatus, &paymentStatus, &bookingDate,
 		)
 		if err != nil {
 			continue
 		}
-		bookings = append(bookings, booking)
+
+		if _, exists := bookingsMap[bookingID]; !exists {
+			bookingsMap[bookingID] = &models.BookingWithDetails{
+				BookingID:     bookingID,
+				BookingCode:   bookingCode,
+				UserID:        userID,
+				ShowtimeID:    showtimeID,
+				MovieTitle:    movieTitle,
+				CinemaName:    cinemaName,
+				TheaterName:   theaterName,
+				ShowDate:      showDate.Time.Format("2006-01-02"),
+				ShowTime:      showTime.String,
+				TotalAmount:   totalAmount,
+				BookingStatus: bookingStatus,
+				PaymentStatus: paymentStatus,
+				BookingDate:   bookingDate.Time,
+				Seats:         []models.SeatInfo{},
+			}
+		}
+	}
+
+	// ดึงข้อมูลที่นั่งสำหรับแต่ละการจอง
+	for bookingID := range bookingsMap {
+		seatsQuery := `
+			SELECT bs.seat_id, s.seat_row, s.seat_number, bs.price
+			FROM booking_seats bs
+			JOIN seats s ON bs.seat_id = s.seat_id
+			WHERE bs.booking_id = $1
+			ORDER BY s.seat_row, s.seat_number
+		`
+
+		seatRows, err := h.db.Query(seatsQuery, bookingID)
+		if err == nil {
+			defer seatRows.Close()
+			for seatRows.Next() {
+				var seatID int
+				var seatRow string
+				var seatNumber int
+				var price float64
+				err := seatRows.Scan(&seatID, &seatRow, &seatNumber, &price)
+				if err == nil {
+					bookingsMap[bookingID].Seats = append(bookingsMap[bookingID].Seats, models.SeatInfo{
+						SeatID:     seatID,
+						SeatRow:    seatRow,
+						SeatNumber: seatNumber,
+						Price:      price,
+					})
+				}
+			}
+		}
+	}
+
+	bookings := make([]models.BookingWithDetails, 0, len(bookingsMap))
+	for _, booking := range bookingsMap {
+		bookings = append(bookings, *booking)
 	}
 
 	c.JSON(http.StatusOK, models.Response{
