@@ -39,6 +39,9 @@ func main() {
 		c.Next()
 	})
 
+	// รูป
+	r.Static("/uploads", "./uploads")
+
 	// Health check
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{

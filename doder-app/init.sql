@@ -121,15 +121,16 @@ CREATE TABLE seat_status (
 -- ผู้ใช้งาน
 INSERT INTO users (password_hash, first_name, last_name, phone, role)
 VALUES
-  ('hash1', 'สมชาย', 'ใจดี', '0812345678', 'customer'),
-  ('hash2', 'ดาริน', 'พันธุ์สุข', '0898765432', 'customer'),
-  ('hash3', 'นนท์', 'มากทรัพย์', '0801122334', 'admin');
+  -- password 123456
+  ('$2a$10$bOg6DJkIZ6N2.ASxS89tT.Hd63byPSsa.nuz8PwxBEIq9Z8ufyJgy', 'Banlu', 'Chimsing', '0925165069', 'customer'),
+  -- password 123456
+  ('$2a$10$MHsLrWXBAH91Py3adN5IlOTff7wjL0xGJuNtVo0EbpJRpQlep4s9C', 'Prabda', 'Pleannuam', '0634432223', 'admin');
 
 -- โรงภาพยนตร์
 INSERT INTO cinemas (cinema_name, address, city)
 VALUES
-  ('Major Cineplex', 'Central Nakhon Pathom', 'Nakhon Pathom'),
-  ('Major Cineplex', 'Lotus Nakhon Pathom', 'Nakhon Pathom');
+  ('Doder Cineplex', 'Central Nakhon Pathom', 'Nakhon Pathom'),
+  ('Doder Cineplex', 'Lotus Nakhon Pathom', 'Nakhon Pathom');
 
 -- โรงที่ฉาย
 INSERT INTO theaters (cinema_id, theater_name, total_seats, theater_type)
@@ -142,26 +143,24 @@ VALUES
 -- หนัง
 INSERT INTO movies (title, description, duration, genres, language, subtitle, poster_url, release_date, is_active)
 VALUES
-  ('ธี่หยด 3', 'ภาคต่อสุดหลอนของเรื่องราว...', 105, ARRAY['Horror', 'Thriller'], 'ไทย', NULL, 'https://example.com/tee_yod_3_poster.jpg', '2025-10-01', TRUE),
-  ('4 เสือ (4 Tigers)', 'สี่เสือในจักรวาลขุนพันธ์...', 140, ARRAY['Action', 'Crime'], 'ไทย', NULL, 'https://example.com/4_tigers_poster.jpg', '2025-10-23', TRUE),
-  ('หลานม่า', 'เรื่องราวความผูกพันระหว่างหลานกับยาย...', 125, ARRAY['Drama', 'Family'], 'ไทย', NULL, 'https://example.com/lan_ma_poster.jpg', '2024-04-18', TRUE),
-  ('สัปเหร่อ', 'หนังผีสุดหลอนจากค่าย GDH...', 130, ARRAY['Horror', 'Comedy'], 'ไทย', NULL, 'https://example.com/sappherao_poster.jpg', '2023-10-19', TRUE),
-  ('Venom: The Last Dance', 'การผจญภัยครั้งสุดท้ายของเวน่อม...', 140, ARRAY['Action', 'Sci-Fi', 'Adventure'], 'อังกฤษ', 'ไทย', 'https://example.com/venom3_poster.jpg', '2024-10-25', TRUE),
-  ('Moana 2', 'การเดินทางครั้งใหม่ของโมอาน่า...', 100, ARRAY['Animation', 'Adventure', 'Family'], 'อังกฤษ', 'ไทย', 'https://example.com/moana2_poster.jpg', '2024-11-27', TRUE),
-  ('Wicked', 'เรื่องราวก่อนพ่อมดแห่งออซ...', 160, ARRAY['Musical', 'Fantasy', 'Drama'], 'อังกฤษ', 'ไทย', 'https://example.com/wicked_poster.jpg', '2024-11-22', TRUE),
-  ('Gladiator II', 'ภาคต่อของนักรบกลาดิเอเตอร์...', 148, ARRAY['Action', 'Drama', 'History'], 'อังกฤษ', 'ไทย', 'https://example.com/gladiator2_poster.jpg', '2024-11-15', TRUE);
+  ('My Boo 2', 'ภาคต่อของเรื่องราวความรักระหว่างมนุษย์กับผี ที่จะต้องเผชิญกับอุปสรรคใหม่', 105, ARRAY['Horror', 'Romance', 'Comedy'], 'ไทย', NULL, '/uploads/posters/my_boo_2.jpg', '2025-11-21', TRUE),
+  ('Zootopia 2', 'การผจญภัยครั้งใหม่ของจูดี้ ฮอปส์ และนิค ไวลด์ ในเมืองที่สัตว์ทุกชนิดอยู่ร่วมกัน', 100, ARRAY['Animation', 'Adventure', 'Comedy', 'Family'], 'อังกฤษ', 'ไทย', '/uploads/posters/zootopia_2.jpg', '2025-11-27', TRUE),
+  ('The Gunman', 'นักฆ่ามืออาชีพที่ต้องหนีไล่ล่าจากองค์กรลับ พร้อมเปิดเผยความจริงที่ถูกปิดบัง', 118, ARRAY['Action', 'Thriller'], 'อังกฤษ', 'ไทย', '/uploads/posters/the_gunman.jpg', '2025-11-15', TRUE),
+  ('4 เสือ (4 Tigers)', 'สี่เสือในจักรวาลขุนพันธ์ที่ต้องร่วมมือกันเพื่อปกป้องดินแดน เรื่องราวแอ็คชั่นสุดมันส์', 140, ARRAY['Action', 'Crime', 'Drama'], 'ไทย', NULL, '/uploads/posters/4_tigers.jpg', '2025-10-23', TRUE);
 
 -- รอบฉาย
 INSERT INTO showtimes (movie_id, theater_id, show_date, show_time, end_time, price, available_seats, is_active)
 VALUES
-  ((SELECT movie_id FROM movies WHERE title = 'ธี่หยด 3'),
+  -- My Boo 2
+  ((SELECT movie_id FROM movies WHERE title = 'My Boo 2'),
    (SELECT theater_id FROM theaters WHERE theater_name='โรง 1' AND cinema_id=(SELECT cinema_id FROM cinemas WHERE address='Central Nakhon Pathom')),
    '2025-11-21','18:30','20:15',200.00,150,TRUE),
 
-  ((SELECT movie_id FROM movies WHERE title = 'ธี่หยด 3'),
+  ((SELECT movie_id FROM movies WHERE title = 'My Boo 2'),
    (SELECT theater_id FROM theaters WHERE theater_name='โรง 2' AND cinema_id=(SELECT cinema_id FROM cinemas WHERE address='Central Nakhon Pathom')),
    '2025-11-21','21:00','22:45',200.00,150,TRUE),
 
+  -- 4 เสือ (4 Tigers)
   ((SELECT movie_id FROM movies WHERE title = '4 เสือ (4 Tigers)'),
    (SELECT theater_id FROM theaters WHERE theater_name='โรง 1' AND cinema_id=(SELECT cinema_id FROM cinemas WHERE address='Central Nakhon Pathom')),
    '2025-11-21','17:00','19:20',220.00,150,TRUE),
@@ -170,10 +169,20 @@ VALUES
    (SELECT theater_id FROM theaters WHERE theater_name='โรง 2' AND cinema_id=(SELECT cinema_id FROM cinemas WHERE address='Central Nakhon Pathom')),
    '2025-11-21','20:00','22:20',220.00,150,TRUE),
 
-  ((SELECT movie_id FROM movies WHERE title = 'Moana 2'),
+  -- Zootopia 2
+  ((SELECT movie_id FROM movies WHERE title = 'Zootopia 2'),
    (SELECT theater_id FROM theaters WHERE theater_name='โรง 1' AND cinema_id=(SELECT cinema_id FROM cinemas WHERE address='Lotus Nakhon Pathom')),
    '2025-11-27','14:00','15:40',180.00,150,TRUE),
 
-  ((SELECT movie_id FROM movies WHERE title = 'Wicked'),
+  ((SELECT movie_id FROM movies WHERE title = 'Zootopia 2'),
    (SELECT theater_id FROM theaters WHERE theater_name='โรง 2' AND cinema_id=(SELECT cinema_id FROM cinemas WHERE address='Lotus Nakhon Pathom')),
-   '2025-11-27','19:00','21:40',250.00,150,TRUE);
+   '2025-11-27','16:00','17:40',180.00,150,TRUE),
+
+  -- The Gunman
+  ((SELECT movie_id FROM movies WHERE title = 'The Gunman'),
+   (SELECT theater_id FROM theaters WHERE theater_name='โรง 1' AND cinema_id=(SELECT cinema_id FROM cinemas WHERE address='Lotus Nakhon Pathom')),
+   '2025-11-21','19:00','20:58',250.00,150,TRUE),
+
+  ((SELECT movie_id FROM movies WHERE title = 'The Gunman'),
+   (SELECT theater_id FROM theaters WHERE theater_name='โรง 2' AND cinema_id=(SELECT cinema_id FROM cinemas WHERE address='Lotus Nakhon Pathom')),
+   '2025-11-21','21:30','23:28',250.00,150,TRUE);

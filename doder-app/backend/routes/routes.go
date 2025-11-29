@@ -17,6 +17,7 @@ func SetupRoutes(router *gin.Engine, db *sql.DB, cronService *services.CronServi
 	showtimeHandler := handlers.NewShowtimeHandler(db)
 	seatHandler := handlers.NewSeatHandler(db)
 	cronHandler := handlers.NewCronHandler(cronService)
+	uploadHandler := handlers.NewUploadHandler()
 	authHandler := handlers.NewAuthHandler(db)
 	authMiddleware := handlers.AuthMiddleware()
 	adminMiddleware := handlers.AdminMiddleware()
@@ -85,6 +86,10 @@ func SetupRoutes(router *gin.Engine, db *sql.DB, cronService *services.CronServi
 			// Cron
 			admin.GET("/cron/status", cronHandler.GetCronStatus)
 			admin.POST("/cron/cancel-expired", cronHandler.TriggerCancelExpiredReservations)
+
+			// Upload
+			admin.POST("/upload/poster", uploadHandler.UploadPoster)
+			admin.DELETE("/upload/poster/:filename", uploadHandler.DeletePoster)
 		}
 	}
 }
