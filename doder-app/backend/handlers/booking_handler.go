@@ -457,8 +457,9 @@ func (h *BookingHandler) ConfirmPayment(c *gin.Context) {
 
 	// ตรวจสอบว่าการจองมีอยู่และยังไม่ได้ชำระเงิน
 	var bookingStatus, paymentStatus string
-	query := "SELECT booking_status, payment_status FROM bookings WHERE booking_id = $1"
-	err = h.db.QueryRow(query, bookingID).Scan(&bookingStatus, &paymentStatus)
+	var showtimeID int
+	query := "SELECT booking_status, payment_status, showtime_id FROM bookings WHERE booking_id = $1"
+	err = h.db.QueryRow(query, bookingID).Scan(&bookingStatus, &paymentStatus, &showtimeID)
 	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, models.ErrorResponse{
 			Success: false,
@@ -490,6 +491,28 @@ func (h *BookingHandler) ConfirmPayment(c *gin.Context) {
 		})
 		return
 	}
+
+	// ตรวจสอบว่าที่นั่งในการจองนี้ถูก confirm โดยคนอื่นไปแล้วหรือไม่
+	conflictQuery := `
+		SELECT bs.seat_id FROM booking_seats bs
+		JOIN bookings b ON bs.booking_id = b.booking_id
+		WHERE bs.seat_id IN (SELECT seat_id FROM booking_seats WHERE booking_id = $1)
+		AND b.showtime_id = $2
+		AND b.booking_status = 'confirmed'
+		AND b.booking_id != $1
+		LIMIT 1
+	`
+	var conflictSeatID int
+	err = h.db.QueryRow(conflictQuery, bookingID, showtimeID).Scan(&conflictSeatID)
+	if err == nil {
+		// มีที่นั่งถูก confirm ไปแล้วโดยคนอื่น
+		c.JSON(http.StatusConflict, models.ErrorResponse{
+			Success: false,
+			Error:   fmt.Sprintf("Seat %d has already been confirmed by another booking. Please select different seats.", conflictSeatID),
+		})
+		return
+	}
+	// ถ้า err == sql.ErrNoRows แปลว่าไม่มี conflict ให้ทำต่อได้
 
 	// อัปเดต payment_status และ booking_status
 	updateQuery := `
