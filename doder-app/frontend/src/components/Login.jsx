@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext'; // 💥 Import useAuth 💥
 
-const API_BASE_URL = "http://localhost:8081/api";
+const API_BASE_URL = "/api";
 
 function Login() {
     // State for form inputs

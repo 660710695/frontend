@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../../styles/AdminMovies.css';
 
-const API_BASE_URL = "http://localhost:8081/api";
+const API_BASE_URL = "/api";
 
 function AdminMovies() {
     const [movies, setMovies] = useState([]);

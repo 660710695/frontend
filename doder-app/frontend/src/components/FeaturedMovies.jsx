@@ -5,7 +5,7 @@ import MovieCard from './MovieCard';
 import '../styles/FeaturedMovies.css';
 // import { movies } from '../contexts/AuthContext'; // 1. ลบการนำเข้า Mock Data
 
-const API_BASE_URL = "http://localhost:8081/api";
+const API_BASE_URL = "/api";
 
 export default function FeaturedMovies() {
     // 2. State สำหรับเก็บข้อมูลภาพยนตร์และสถานะการโหลด

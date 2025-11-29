@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom'; // 💥 REQUIRED IMPORT 💥
 import { useNavigate } from 'react-router-dom'; // 💥 NEW IMPORT 💥
 
-const API_BASE_URL = "http://localhost:8081/api";
+const API_BASE_URL = "/api";
 
 function AdminTheaters() {
     // 💥 Read the cinema_id from the URL query parameters 💥

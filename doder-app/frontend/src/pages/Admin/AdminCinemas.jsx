@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; // 💥 NEW IMPORT 💥
 
-const API_BASE_URL = "http://localhost:8081/api";
+const API_BASE_URL = "/api";
 
 function AdminCinemas() {
     const [cinemas, setCinemas] = useState([]);
