@@ -10,13 +10,22 @@ function CheckOut() {
   const time = query.get("time");
   const seats = query.get("seats")?.split(",") || [];
 
-  const seatPrice = 180; // you can change
+  const seatPrice = 180;
   const total = seats.length * seatPrice;
 
   const navigate = useNavigate();
 
   const handleConfirm = () => {
-    navigate("/success"); // later create success page
+    // ส่ง params ไป Success page
+    const params = new URLSearchParams({
+      movie: movieId,
+      cinema: cinemaId,
+      date: date,
+      time: time,
+      seats: seats.join(","),
+      total: total,
+    });
+    navigate(`/success?${params.toString()}`);
   };
 
   return (

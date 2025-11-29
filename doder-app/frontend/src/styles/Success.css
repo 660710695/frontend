@@ -1,0 +1,261 @@
+.success-page {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+.success-container {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  max-width: 700px;
+  width: 100%;
+  padding: 40px;
+  text-align: center;
+}
+
+/* Success Icon */
+.success-icon {
+  margin-bottom: 30px;
+  animation: slideDown 0.6s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Heading */
+.success-container h1 {
+  font-size: 2.5rem;
+  color: #333;
+  margin: 20px 0 10px;
+  font-weight: 700;
+}
+
+.success-message {
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 40px;
+}
+
+/* Booking Details Section */
+.booking-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin: 40px 0;
+  text-align: left;
+}
+
+.detail-section,
+.payment-section {
+  background: #f9f9f9;
+  padding: 25px;
+  border-radius: 12px;
+  border-left: 4px solid #667eea;
+}
+
+.payment-section {
+  border-left-color: #4CAF50;
+}
+
+.detail-section h3,
+.payment-section h3 {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 20px;
+  margin-top: 0;
+}
+
+/* Detail Rows */
+.detail-row,
+.payment-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 0.95rem;
+}
+
+.detail-row .label,
+.payment-row .label {
+  color: #666;
+  font-weight: 500;
+}
+
+.detail-row .value,
+.payment-row .value {
+  color: #333;
+  font-weight: 600;
+}
+
+.seats-value {
+  color: #667eea;
+  font-weight: 700;
+}
+
+/* Total Row */
+.total-row {
+  border-top: 2px solid #ddd;
+  padding-top: 12px;
+  margin-top: 15px;
+  font-size: 1.1rem;
+}
+
+.total-amount {
+  color: #4CAF50;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+/* Payment Status */
+.payment-status {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.status-badge.paid {
+  background: #E8F5E9;
+  color: #2E7D32;
+}
+
+/* Instructions */
+.instructions {
+  background: #FFF9E6;
+  border-left: 4px solid #FFC107;
+  padding: 25px;
+  border-radius: 12px;
+  margin: 40px 0;
+  text-align: left;
+}
+
+.instructions h3 {
+  color: #333;
+  margin-top: 0;
+  font-size: 1.1rem;
+}
+
+.instructions ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.instructions li {
+  color: #555;
+  margin-bottom: 10px;
+  padding-left: 25px;
+  position: relative;
+  line-height: 1.5;
+}
+
+.instructions li:before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: #FFC107;
+  font-weight: bold;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 40px;
+  justify-content: center;
+}
+
+.btn {
+  padding: 12px 30px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background: #667eea;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #5568d3;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+  background: #f0f0f0;
+  color: #333;
+  border: 2px solid #ddd;
+}
+
+.btn-secondary:hover {
+  background: #e8e8e8;
+  border-color: #999;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .success-container {
+    padding: 25px;
+  }
+
+  .success-container h1 {
+    font-size: 2rem;
+  }
+
+  .booking-details {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+  }
+}
+
+/* Print Styles */
+@media print {
+  body {
+    background: white;
+  }
+
+  .success-page {
+    background: white;
+    padding: 0;
+  }
+
+  .success-container {
+    box-shadow: none;
+    max-width: 100%;
+  }
+
+  .action-buttons {
+    display: none;
+  }
+}

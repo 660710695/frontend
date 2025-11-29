@@ -14,6 +14,7 @@ import MovieDetail from "./pages/MovieDetail";
 import Profile from "./pages/Profile";
 import SeatPicker from "./components/SeatPicker";
 import CheckOut from "./pages/CheckOut";
+import Success from "./pages/Success";
 
 // NEW ADMIN IMPORTS
 import AdminDashboard from "./pages/Admin/AdminDashboard"; // Assuming this path
@@ -42,6 +43,7 @@ function App() {
           {/* PROTECTED ROUTES (Login Required) */}
           <Route path="/seats" element={<ProtectedRoute><SeatPicker /></ProtectedRoute>} />
           <Route path="/checkout" element={<ProtectedRoute><CheckOut /></ProtectedRoute>} />
+          <Route path="/success" element={<ProtectedRoute><Success /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
 
           {/* 💥 ADMIN PROTECTED ROUTES (Admin Role Required) 💥 */}
