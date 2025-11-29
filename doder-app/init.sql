@@ -116,14 +116,12 @@ CREATE TABLE seat_status (
     UNIQUE(showtime_id, seat_id)
 );
 
--- insert
-
 -- ผู้ใช้งาน
 INSERT INTO users (password_hash, first_name, last_name, phone, role)
 VALUES
-  -- password 123456
+  -- password: 123456
   ('$2a$10$bOg6DJkIZ6N2.ASxS89tT.Hd63byPSsa.nuz8PwxBEIq9Z8ufyJgy', 'Banlu', 'Chimsing', '0925165069', 'customer'),
-  -- password 123456
+  -- password: 123456
   ('$2a$10$MHsLrWXBAH91Py3adN5IlOTff7wjL0xGJuNtVo0EbpJRpQlep4s9C', 'Prabda', 'Pleannuam', '0634432223', 'admin');
 
 -- โรงภาพยนตร์
@@ -139,6 +137,50 @@ VALUES
   ((SELECT cinema_id FROM cinemas WHERE address = 'Central Nakhon Pathom'), 'โรง 2', 150, 'standard'),
   ((SELECT cinema_id FROM cinemas WHERE address = 'Lotus Nakhon Pathom'), 'โรง 1', 150, 'standard'),
   ((SELECT cinema_id FROM cinemas WHERE address = 'Lotus Nakhon Pathom'), 'โรง 2', 150, 'standard');
+
+-- โรง 1
+INSERT INTO seats (theater_id, seat_row, seat_number, seat_type)
+SELECT 
+    1 as theater_id,
+    chr(64 + row_num) as seat_row,  -- A-E
+    seat_num,
+    'standard' as seat_type
+FROM 
+    generate_series(1, 5) row_num,
+    generate_series(1, 30) seat_num;
+
+-- โรง 2
+INSERT INTO seats (theater_id, seat_row, seat_number, seat_type)
+SELECT 
+    2 as theater_id,
+    chr(64 + row_num) as seat_row,
+    seat_num,
+    'standard' as seat_type
+FROM 
+    generate_series(1, 5) row_num,
+    generate_series(1, 30) seat_num;
+
+-- โรง 3
+INSERT INTO seats (theater_id, seat_row, seat_number, seat_type)
+SELECT 
+    3 as theater_id,
+    chr(64 + row_num) as seat_row,
+    seat_num,
+    'standard' as seat_type
+FROM 
+    generate_series(1, 5) row_num,
+    generate_series(1, 30) seat_num;
+
+-- โรง 4
+INSERT INTO seats (theater_id, seat_row, seat_number, seat_type)
+SELECT 
+    4 as theater_id,
+    chr(64 + row_num) as seat_row,
+    seat_num,
+    'standard' as seat_type
+FROM 
+    generate_series(1, 5) row_num,
+    generate_series(1, 30) seat_num;
 
 -- หนัง
 INSERT INTO movies (title, description, duration, genres, language, subtitle, poster_url, release_date, is_active)
