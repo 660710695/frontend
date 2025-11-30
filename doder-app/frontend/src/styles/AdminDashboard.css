@@ -104,20 +104,7 @@
     gap: 12px;
 }
 
-/* Card Icons */
-.admin-card h2::before {
-    content: '📊';
-    font-size: 1.5rem;
-}
-
-.admin-card:nth-child(1) h2::before { content: '🎬'; }
-.admin-card:nth-child(2) h2::before { content: '🏛️'; }
-.admin-card:nth-child(3) h2::before { content: '🎭'; }
-.admin-card:nth-child(4) h2::before { content: '📅'; }
-.admin-card:nth-child(5) h2::before { content: '💺'; }
-.admin-card:nth-child(6) h2::before { content: '📸'; }
-.admin-card:nth-child(7) h2::before { content: '🎟️'; }
-.admin-card:nth-child(8) h2::before { content: '👤'; }
+/* Description text */
 
 /* Description text */
 .admin-card p {
