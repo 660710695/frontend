@@ -13,6 +13,7 @@ import Movies from "./pages/Movies";
 import MovieDetail from "./pages/MovieDetail";
 import MoviesByGenre from "./pages/MoviesByGenre";
 import Profile from "./pages/Profile";
+import BookingHistory from "./pages/BookingHistory";
 import SeatPicker from "./components/SeatPicker";
 import CheckOut from "./pages/CheckOut";
 import Success from "./pages/Success";
@@ -47,6 +48,7 @@ function App() {
           <Route path="/checkout" element={<ProtectedRoute><CheckOut /></ProtectedRoute>} />
           <Route path="/success" element={<ProtectedRoute><Success /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/booking-history" element={<ProtectedRoute><BookingHistory /></ProtectedRoute>} />
 
           {/* 💥 ADMIN PROTECTED ROUTES (Admin Role Required) 💥 */}
 

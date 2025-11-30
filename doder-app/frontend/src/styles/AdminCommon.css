@@ -1,10 +1,19 @@
 .admin-page {
     max-width: 1200px;
+    background-color: #ffffff;
     margin: 0 auto;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #333;
+    color: #000000;
+    padding: 30px;
 }
-
+.admin-container {
+  min-height: 100vh;
+  padding: 40px 20px;
+  background-color: #ffffff;
+  color: #000000;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  text-align: center;
+}
 .admin-page h1 {
     font-size: 2em;
     margin-bottom: 20px;
@@ -142,6 +151,20 @@ button.info:hover {
 
 .admin-page table tr:hover {
     background-color: #f1f1f1;
+}
+
+.table-actions {
+    display: flex;       /* ⬅️ เปิดใช้งาน Flexbox ที่นี่ */
+    gap: 5px;            /* ระยะห่างระหว่างปุ่ม */
+    justify-content: center; /* จัดกลุ่มปุ่มให้อยู่ตรงกลางเซลล์ */
+    align-items: center; 
+    flex-wrap: wrap;     /* ให้ปุ่มขึ้นบรรทัดใหม่ได้หากเซลล์แคบ */
+}
+
+/* ปรับขนาดปุ่มให้เล็กลงสำหรับใช้ในตาราง (ไม่บังคับ) */
+.admin-page table .table-actions button {
+    padding: 6px 10px;
+    font-size: 0.85em; 
 }
 
 /* --- Seat Grid Map --- */

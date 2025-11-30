@@ -2,14 +2,19 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import '../../styles/AdminCommon.css';
+import '../../styles/AdminMovies.css';
 
 const API_BASE_URL = "/api";
 
 const initialMovieState = {
     title: '',
+    description: '',
     duration: '',
-    genres: '', // comma-separated string for form
+    genres: '',
+    language: '',
+    subtitle: '',
+    poster_url: '',
+    release_date: '',
     is_active: true,
 };
 
@@ -25,7 +30,6 @@ function AdminMovies() {
 
     const getToken = () => localStorage.getItem('authToken');
 
-    // --- Fetch all movies ---
     const fetchMovies = async () => {
         if (!isAdmin) {
             setLoading(false);
@@ -66,18 +70,27 @@ function AdminMovies() {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setNewMovie(prev => ({ ...prev, [name]: name === 'duration' ? parseInt(value, 10) : value }));
+        setNewMovie(prev => ({ 
+            ...prev, 
+            [name]: name === 'duration' ? parseInt(value, 10) || '' : value 
+        }));
     };
 
+    const formatDateForInput = (dateStr) => dateStr ? dateStr.split('T')[0] : '';
+
     const handleEditClick = (movie) => {
-    // Check movie.genres instead of movie.genre
-    const genreString = Array.isArray(movie.genres) ? movie.genres.join(', ') : movie.genres; 
-    setNewMovie({
-        title: movie.title,
-        duration: movie.duration,
-        genres: genreString, // 💥 FIX: Use genres 💥
-        is_active: movie.is_active,
-    });
+        const genreString = Array.isArray(movie.genres) ? movie.genres.join(', ') : movie.genres || '';
+        setNewMovie({
+            title: movie.title || '',
+            description: movie.description || '',
+            duration: movie.duration || '',
+            genres: genreString,
+            language: movie.language || '',
+            subtitle: movie.subtitle || '',
+            poster_url: movie.poster_url || '',
+            release_date: formatDateForInput(movie.release_date),
+            is_active: movie.is_active,
+        });
         setEditingMovieId(movie.movie_id);
         setStatus(null);
     };
@@ -102,8 +115,14 @@ function AdminMovies() {
 
         try {
             const payload = {
-                ...newMovie,
-                genres: newMovie.genres.split(',').map(g => g.trim()),
+                title: newMovie.title,
+                description: newMovie.description,
+                duration: parseInt(newMovie.duration, 10),
+                genres: newMovie.genres.split(',').map(g => g.trim()).filter(g => g),
+                language: newMovie.language,
+                subtitle: newMovie.subtitle,
+                poster_url: newMovie.poster_url,
+                release_date: newMovie.release_date,
             };
 
             const response = await fetch(`${API_BASE_URL}/admin/movies`, {
@@ -131,8 +150,15 @@ function AdminMovies() {
 
         try {
             const payload = {
-                ...newMovie,
-                genres: newMovie.genres.split(',').map(g => g.trim()),
+                title: newMovie.title,
+                description: newMovie.description,
+                duration: parseInt(newMovie.duration, 10),
+                genres: newMovie.genres.split(',').map(g => g.trim()).filter(g => g),
+                language: newMovie.language,
+                subtitle: newMovie.subtitle,
+                poster_url: newMovie.poster_url,
+                release_date: newMovie.release_date,
+                is_active: newMovie.is_active,
             };
 
             const response = await fetch(`${API_BASE_URL}/admin/movies/${movieId}`, {
@@ -179,7 +205,6 @@ function AdminMovies() {
     };
 
     if (isAuthLoading) return <div className="admin-page">กำลังโหลดการตรวจสอบสิทธิ์...</div>;
-
     if (!isAdmin) {
         return (
             <div className="admin-page">
@@ -189,10 +214,10 @@ function AdminMovies() {
             </div>
         );
     }
-
     if (loading) return <div className="admin-page">Loading movie data...</div>;
 
     return (
+        <div className='admin-container'>
         <div className="admin-page">
             <h1>จัดการภาพยนตร์</h1>
 
@@ -205,13 +230,68 @@ function AdminMovies() {
             <h2>{editingMovieId ? `✏️ แก้ไขภาพยนตร์ ID: ${editingMovieId}` : '+ เพิ่มภาพยนตร์ใหม่'}</h2>
 
             <form className="admin-form" onSubmit={handleSubmit}>
-                <input type="text" name="title" placeholder="ชื่อภาพยนตร์" value={newMovie.title} onChange={handleInputChange} required />
-                <input type="number" name="duration" placeholder="ระยะเวลา (นาที)" value={newMovie.duration} onChange={handleInputChange} required />
-                <input type="text" name="genres" placeholder="ประเภท (เช่น Action, Comedy)" value={newMovie.genres} onChange={handleInputChange} required />
+                <input 
+                    type="text" 
+                    name="title" 
+                    placeholder="ชื่อภาพยนตร์ *" 
+                    value={newMovie.title} 
+                    onChange={handleInputChange} 
+                    required 
+                />
+                <textarea 
+                    name="description" 
+                    placeholder="คำอธิบาย"
+                    value={newMovie.description} 
+                    onChange={handleInputChange}
+                    rows="4"
+                />
+                <input 
+                    type="number" 
+                    name="duration" 
+                    placeholder="ระยะเวลา (นาที) *" 
+                    value={newMovie.duration} 
+                    onChange={handleInputChange} 
+                    required 
+                />
+                <input 
+                    type="text" 
+                    name="genres" 
+                    placeholder="ประเภท (เช่น Action, Comedy, Drama) *" 
+                    value={newMovie.genres} 
+                    onChange={handleInputChange} 
+                    required 
+                />
+                <input 
+                    type="text" 
+                    name="language" 
+                    placeholder="ภาษา (เช่น ไทย, English)"
+                    value={newMovie.language} 
+                    onChange={handleInputChange}
+                />
+                <input 
+                    type="text" 
+                    name="subtitle" 
+                    placeholder="คำบรรยาย (เช่น Thai, English)"
+                    value={newMovie.subtitle} 
+                    onChange={handleInputChange}
+                />
+                <input 
+                    type="url" 
+                    name="poster_url" 
+                    placeholder="URL รูปโปสเตอร์"
+                    value={newMovie.poster_url} 
+                    onChange={handleInputChange}
+                />
+                <input 
+                    type="date" 
+                    name="release_date" 
+                    value={newMovie.release_date} 
+                    onChange={handleInputChange}
+                />
 
-                <div className="form-actions" style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                <div className="form-actions">
                     <button type="submit" className="primary">
-                        {editingMovieId ? 'บันทึกการแก้ไข (Update)' : 'บันทึกภาพยนตร์ (Create)'}
+                        {editingMovieId ? 'บันทึกการแก้ไข' : 'บันทึกภาพยนตร์'}
                     </button>
                     {editingMovieId && <button type="button" className="secondary" onClick={handleCancelEdit}>ยกเลิก</button>}
                 </div>
@@ -226,6 +306,9 @@ function AdminMovies() {
                         <th>ชื่อภาพยนตร์</th>
                         <th>ระยะเวลา</th>
                         <th>ประเภท</th>
+                        <th>ภาษา</th>
+                        <th>คำบรรยาย</th>
+                        <th>วันที่เข้าฉาย</th>
                         <th>สถานะ</th>
                         <th>จัดการ</th>
                     </tr>
@@ -236,7 +319,10 @@ function AdminMovies() {
                             <td>{m.movie_id}</td>
                             <td>{m.title}</td>
                             <td>{m.duration} นาที</td>
-                            <td>{Array.isArray(m.genres) ? m.genres.join(', ') : m.genres}</td>
+                            <td>{Array.isArray(m.genres) ? m.genres.join(', ') : m.genres || '-'}</td>
+                            <td>{m.language || '-'}</td>
+                            <td>{m.subtitle || '-'}</td>
+                            <td>{m.release_date ? formatDateForInput(m.release_date) : '-'}</td>
                             <td className={m.is_active ? 'status-success' : 'status-error'}>
                                 {m.is_active ? 'เปิดใช้งาน' : 'ปิดใช้งาน'}
                             </td>
@@ -250,6 +336,7 @@ function AdminMovies() {
                     ))}
                 </tbody>
             </table>
+        </div>
         </div>
     );
 }

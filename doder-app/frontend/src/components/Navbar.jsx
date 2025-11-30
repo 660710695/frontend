@@ -67,6 +67,9 @@ function Navbar() {
                   <Link to="/profile" className="dropdown-item">
                     ดูโปรไฟล์
                   </Link>
+                  <Link to="/booking-history" className="dropdown-item">
+                    ดูประวัติการจอง
+                  </Link>
                   
                   <button onClick={handleLogout} className="dropdown-item logout-item">
                     ออกจากระบบ

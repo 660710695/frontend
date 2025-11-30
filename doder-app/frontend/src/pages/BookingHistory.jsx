@@ -197,6 +197,7 @@ function BookingHistory() {
     }
 
     return (
+        <div className="booking-container">
         <div className="booking-history-page">
             <div className="page-header">
                 <h1>ประวัติการจอง</h1>
@@ -328,6 +329,7 @@ function BookingHistory() {
                     })}
                 </div>
             )}
+        </div>
         </div>
     );
 }
