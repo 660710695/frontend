@@ -1,6 +1,6 @@
 // AdminMovies.jsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import '../../styles/AdminMovies.css';
 
@@ -10,7 +10,7 @@ const initialMovieState = {
     title: '',
     description: '',
     duration: '',
-    genres: '',
+    genres: '', 
     language: '',
     subtitle: '',
     poster_url: '',
@@ -27,6 +27,9 @@ function AdminMovies() {
     const [status, setStatus] = useState(null);
     const [newMovie, setNewMovie] = useState(initialMovieState);
     const [editingMovieId, setEditingMovieId] = useState(null);
+    const [uploading, setUploading] = useState(false);
+    const [previewImage, setPreviewImage] = useState(null);
+    const fileInputRef = useRef(null);
 
     const getToken = () => localStorage.getItem('authToken');
 
@@ -70,16 +73,14 @@ function AdminMovies() {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setNewMovie(prev => ({ 
-            ...prev, 
-            [name]: name === 'duration' ? parseInt(value, 10) || '' : value 
-        }));
+        setNewMovie(prev => ({ ...prev, [name]: name === 'duration' ? parseInt(value, 10) || '' : value }));
     };
 
     const formatDateForInput = (dateStr) => dateStr ? dateStr.split('T')[0] : '';
 
     const handleEditClick = (movie) => {
-        const genreString = Array.isArray(movie.genres) ? movie.genres.join(', ') : movie.genres || '';
+        // Check movie.genres instead of movie.genre
+        const genreString = Array.isArray(movie.genres) ? movie.genres.join(', ') : movie.genres || ''; 
         setNewMovie({
             title: movie.title || '',
             description: movie.description || '',
@@ -88,17 +89,80 @@ function AdminMovies() {
             language: movie.language || '',
             subtitle: movie.subtitle || '',
             poster_url: movie.poster_url || '',
-            release_date: formatDateForInput(movie.release_date),
+            release_date: movie.release_date ? movie.release_date.split('T')[0] : '',
             is_active: movie.is_active,
         });
         setEditingMovieId(movie.movie_id);
+        setPreviewImage(null); // Clear preview, will show existing poster_url instead
         setStatus(null);
+        if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
     const handleCancelEdit = () => {
         setNewMovie(initialMovieState);
         setEditingMovieId(null);
         setStatus(null);
+        setPreviewImage(null);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+    };
+
+    // Handle image upload
+    const handleImageUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Validate file type
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+        if (!allowedTypes.includes(file.type)) {
+            setStatus({ type: 'error', message: 'รองรับเฉพาะไฟล์ .jpg, .jpeg, .png, .webp เท่านั้น' });
+            return;
+        }
+
+        // Validate file size (5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            setStatus({ type: 'error', message: 'ไฟล์ใหญ่เกิน 5MB' });
+            return;
+        }
+
+        // Show preview
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setPreviewImage(reader.result);
+        };
+        reader.readAsDataURL(file);
+
+        // Upload to server
+        setUploading(true);
+        setStatus(null);
+        const token = getToken();
+
+        try {
+            const formData = new FormData();
+            formData.append('poster', file);
+
+            const response = await fetch(`${API_BASE_URL}/admin/upload/poster`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: formData,
+            });
+
+            const data = await response.json();
+            if (!response.ok || !data.success) {
+                throw new Error(data.error || 'อัพโหลดรูปภาพไม่สำเร็จ');
+            }
+
+            // Set the poster URL to the form
+            setNewMovie(prev => ({ ...prev, poster_url: data.data.url }));
+            setStatus({ type: 'success', message: `อัพโหลดรูปภาพสำเร็จ: ${data.data.filename}` });
+
+        } catch (err) {
+            setStatus({ type: 'error', message: `อัพโหลดล้มเหลว: ${err.message}` });
+            setPreviewImage(null);
+        } finally {
+            setUploading(false);
+        }
     };
 
     const handleSubmit = (e) => {
@@ -116,13 +180,13 @@ function AdminMovies() {
         try {
             const payload = {
                 title: newMovie.title,
-                description: newMovie.description,
+                description: newMovie.description || null,
                 duration: parseInt(newMovie.duration, 10),
-                genres: newMovie.genres.split(',').map(g => g.trim()).filter(g => g),
-                language: newMovie.language,
-                subtitle: newMovie.subtitle,
-                poster_url: newMovie.poster_url,
-                release_date: newMovie.release_date,
+                genres: newMovie.genres ? newMovie.genres.split(',').map(g => g.trim()).filter(g => g) : [],
+                language: newMovie.language || null,
+                subtitle: newMovie.subtitle || null,
+                poster_url: newMovie.poster_url || null,
+                release_date: newMovie.release_date || null,
             };
 
             const response = await fetch(`${API_BASE_URL}/admin/movies`, {
@@ -151,13 +215,13 @@ function AdminMovies() {
         try {
             const payload = {
                 title: newMovie.title,
-                description: newMovie.description,
+                description: newMovie.description || null,
                 duration: parseInt(newMovie.duration, 10),
-                genres: newMovie.genres.split(',').map(g => g.trim()).filter(g => g),
-                language: newMovie.language,
-                subtitle: newMovie.subtitle,
-                poster_url: newMovie.poster_url,
-                release_date: newMovie.release_date,
+                genres: newMovie.genres ? newMovie.genres.split(',').map(g => g.trim()).filter(g => g) : [],
+                language: newMovie.language || null,
+                subtitle: newMovie.subtitle || null,
+                poster_url: newMovie.poster_url || null,
+                release_date: newMovie.release_date || null,
                 is_active: newMovie.is_active,
             };
 
@@ -230,70 +294,96 @@ function AdminMovies() {
             <h2>{editingMovieId ? `✏️ แก้ไขภาพยนตร์ ID: ${editingMovieId}` : '+ เพิ่มภาพยนตร์ใหม่'}</h2>
 
             <form className="admin-form" onSubmit={handleSubmit}>
-                <input 
-                    type="text" 
-                    name="title" 
-                    placeholder="ชื่อภาพยนตร์ *" 
-                    value={newMovie.title} 
-                    onChange={handleInputChange} 
-                    required 
-                />
-                <textarea 
-                    name="description" 
-                    placeholder="คำอธิบาย"
-                    value={newMovie.description} 
-                    onChange={handleInputChange}
-                    rows="4"
-                />
-                <input 
-                    type="number" 
-                    name="duration" 
-                    placeholder="ระยะเวลา (นาที) *" 
-                    value={newMovie.duration} 
-                    onChange={handleInputChange} 
-                    required 
-                />
-                <input 
-                    type="text" 
-                    name="genres" 
-                    placeholder="ประเภท (เช่น Action, Comedy, Drama) *" 
-                    value={newMovie.genres} 
-                    onChange={handleInputChange} 
-                    required 
-                />
-                <input 
-                    type="text" 
-                    name="language" 
-                    placeholder="ภาษา (เช่น ไทย, English)"
-                    value={newMovie.language} 
-                    onChange={handleInputChange}
-                />
-                <input 
-                    type="text" 
-                    name="subtitle" 
-                    placeholder="คำบรรยาย (เช่น Thai, English)"
-                    value={newMovie.subtitle} 
-                    onChange={handleInputChange}
-                />
-                <input 
-                    type="url" 
-                    name="poster_url" 
-                    placeholder="URL รูปโปสเตอร์"
-                    value={newMovie.poster_url} 
-                    onChange={handleInputChange}
-                />
-                <input 
-                    type="date" 
-                    name="release_date" 
-                    value={newMovie.release_date} 
-                    onChange={handleInputChange}
-                />
+                <div className="form-grid">
+                    <div className="form-group">
+                        <label>ชื่อภาพยนตร์ *</label>
+                        <input type="text" name="title" placeholder="เช่น Avengers: Endgame" value={newMovie.title} onChange={handleInputChange} required />
+                    </div>
+                    
+                    <div className="form-group">
+                        <label>ระยะเวลา (นาที) *</label>
+                        <input type="number" name="duration" placeholder="เช่น 120" value={newMovie.duration} onChange={handleInputChange} required min="1" />
+                    </div>
+                    
+                    <div className="form-group">
+                        <label>ประเภท (คั่นด้วย comma) *</label>
+                        <input type="text" name="genres" placeholder="เช่น Action, Adventure, Sci-Fi" value={newMovie.genres} onChange={handleInputChange} required />
+                    </div>
+                    
+                    <div className="form-group">
+                        <label>ภาษา</label>
+                        <input type="text" name="language" placeholder="เช่น English, Thai" value={newMovie.language} onChange={handleInputChange} />
+                    </div>
+                    
+                    <div className="form-group">
+                        <label>ซับไตเติล</label>
+                        <input type="text" name="subtitle" placeholder="เช่น Thai, English" value={newMovie.subtitle} onChange={handleInputChange} />
+                    </div>
+                    
+                    <div className="form-group">
+                        <label>วันที่เข้าฉาย</label>
+                        <input type="date" name="release_date" value={newMovie.release_date} onChange={handleInputChange} />
+                    </div>
+                    
+                    {/* Image Upload Section */}
+                    <div className="form-group full-width">
+                        <label>อัพโหลดโปสเตอร์</label>
+                        <div className="upload-section">
+                            <div className="upload-area">
+                                <input 
+                                    type="file" 
+                                    ref={fileInputRef}
+                                    accept="image/jpeg,image/jpg,image/png,image/webp"
+                                    onChange={handleImageUpload}
+                                    id="poster-upload"
+                                    style={{ display: 'none' }}
+                                />
+                                <label htmlFor="poster-upload" className="upload-btn">
+                                    {uploading ? '⏳ กำลังอัพโหลด...' : '📁 เลือกไฟล์รูปภาพ'}
+                                </label>
+                                <span className="upload-hint">รองรับ: JPG, PNG, WEBP (ไม่เกิน 5MB)</span>
+                            </div>
+                            
+                            {/* Preview */}
+                            {(previewImage || newMovie.poster_url) && (
+                                <div className="preview-area">
+                                    <img 
+                                        src={previewImage || newMovie.poster_url} 
+                                        alt="Preview" 
+                                        className="poster-preview"
+                                    />
+                                    {newMovie.poster_url && (
+                                        <div className="poster-url-display">
+                                            ✅ {newMovie.poster_url}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="form-group full-width">
+                        <label>หรือใส่ URL โปสเตอร์</label>
+                        <input type="text" name="poster_url" placeholder="https://example.com/poster.jpg" value={newMovie.poster_url} onChange={handleInputChange} />
+                    </div>
+                    
+                    <div className="form-group full-width">
+                        <label>คำอธิบาย / เรื่องย่อ</label>
+                        <textarea 
+                            name="description" 
+                            placeholder="เรื่องย่อของภาพยนตร์..." 
+                            value={newMovie.description} 
+                            onChange={handleInputChange}
+                            rows="3"
+                        />
+                    </div>
+                </div>
 
                 <div className="form-actions">
-                    <button type="submit" className="primary">
-                        {editingMovieId ? 'บันทึกการแก้ไข' : 'บันทึกภาพยนตร์'}
+                    <button type="submit" className="primary" disabled={uploading}>
+                        {editingMovieId ? '💾 บันทึกการแก้ไข' : '➕ เพิ่มภาพยนตร์'}
                     </button>
-                    {editingMovieId && <button type="button" className="secondary" onClick={handleCancelEdit}>ยกเลิก</button>}
+                    {editingMovieId && <button type="button" className="secondary" onClick={handleCancelEdit}>❌ ยกเลิก</button>}
                 </div>
             </form>
 
@@ -303,6 +393,7 @@ function AdminMovies() {
                 <thead>
                     <tr>
                         <th>ID</th>
+                        <th>โปสเตอร์</th>
                         <th>ชื่อภาพยนตร์</th>
                         <th>ระยะเวลา</th>
                         <th>ประเภท</th>
@@ -317,20 +408,34 @@ function AdminMovies() {
                     {movies.map(m => (
                         <tr key={m.movie_id}>
                             <td>{m.movie_id}</td>
-                            <td>{m.title}</td>
-                            <td>{m.duration} นาที</td>
-                            <td>{Array.isArray(m.genres) ? m.genres.join(', ') : m.genres || '-'}</td>
-                            <td>{m.language || '-'}</td>
-                            <td>{m.subtitle || '-'}</td>
-                            <td>{m.release_date ? formatDateForInput(m.release_date) : '-'}</td>
-                            <td className={m.is_active ? 'status-success' : 'status-error'}>
-                                {m.is_active ? 'เปิดใช้งาน' : 'ปิดใช้งาน'}
+                            <td>
+                                {m.poster_url ? (
+                                    <img 
+                                        src={m.poster_url} 
+                                        alt={m.title} 
+                                        style={{ width: '50px', height: '75px', objectFit: 'cover', borderRadius: '4px' }}
+                                    />
+                                ) : (
+                                    <span style={{ color: '#64748b', fontSize: '0.85rem' }}>ไม่มีรูป</span>
+                                )}
                             </td>
-                            <td style={{ display: 'flex', gap: '5px', flexWrap: 'wrap', justifyContent: 'center' }}>
-                                <button className="primary" onClick={() => handleEditClick(m)}>แก้ไข</button>
-                                <button className={m.is_active ? 'danger' : 'primary'} onClick={() => handleDeleteMovie(m.movie_id, m.is_active)}>
-                                    {m.is_active ? 'ปิดใช้งาน' : 'เปิดใช้งาน'}
-                                </button>
+                            <td>
+                                <div style={{ fontWeight: '600' }}>{m.title}</div>
+                                {m.language && <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>🌐 {m.language}</div>}
+                                {m.release_date && <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>📅 {m.release_date}</div>}
+                            </td>
+                            <td>{m.duration} นาที</td>
+                            <td>{Array.isArray(m.genres) ? m.genres.join(', ') : m.genres}</td>
+                            <td className={m.is_active ? 'status-active' : 'status-inactive'}>
+                                {m.is_active ? '✅ เปิดใช้งาน' : '❌ ปิดใช้งาน'}
+                            </td>
+                            <td>
+                                <div className="action-buttons">
+                                    <button className="info" onClick={() => handleEditClick(m)}>✏️ แก้ไข</button>
+                                    <button className={m.is_active ? 'danger' : 'success'} onClick={() => handleDeleteMovie(m.movie_id, m.is_active)}>
+                                        {m.is_active ? '🚫 ปิด' : '✅ เปิด'}
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     ))}

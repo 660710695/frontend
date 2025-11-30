@@ -1,3 +1,8 @@
+/* ========================================
+   ADMIN PANEL - Professional Theme
+   ======================================== */
+
+/* --- Main Container --- */
 .admin-page {
     max-width: 1200px;
     background-color: #ffffff;
@@ -14,143 +19,473 @@
   font-family: 'Segoe UI', Roboto, sans-serif;
   text-align: center;
 }
+
+/* --- Page Header --- */
 .admin-page h1 {
-    font-size: 2em;
-    margin-bottom: 20px;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 3px solid #3b82f6;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    letter-spacing: 0.5px;
 }
 
+.admin-page h1::before {
+    content: '⚙️';
+    font-size: 1.8rem;
+}
+
+/* --- Section Headers --- */
 .admin-page h2 {
-    font-size: 1.3em;
-    margin-top: 30px;
-    margin-bottom: 15px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #94a3b8;
+    margin-top: 35px;
+    margin-bottom: 20px;
+    padding: 12px 18px;
+    background: linear-gradient(90deg, rgba(59, 130, 246, 0.15) 0%, transparent 100%);
+    border-left: 4px solid #3b82f6;
+    border-radius: 0 8px 8px 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 /* --- Status Messages --- */
 .admin-page p,
 .admin-page div.status-message {
-    padding: 10px 15px;
-    border-radius: 5px;
+    padding: 14px 20px;
+    border-radius: 8px;
     margin-bottom: 20px;
-    font-weight: bold;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .status-success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(34, 197, 94, 0.1) 100%);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    box-shadow: 0 4px 15px rgba(34, 197, 94, 0.1);
+}
+
+.status-success::before {
+    content: '✓';
+    font-weight: bold;
+    background: #22c55e;
+    color: white;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 12px;
 }
 
 .status-error {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.1) 100%);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.1);
 }
 
-/* --- Forms --- */
-.admin-page form {
+.status-error::before {
+    content: '!';
+    font-weight: bold;
+    background: #ef4444;
+    color: white;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 12px;
+}
+
+/* --- Form Card Container --- */
+.admin-page form,
+.admin-form {
+    background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
+    padding: 28px 32px;
+    border-radius: 16px;
     margin-bottom: 40px;
+    border: 1px solid rgba(148, 163, 184, 0.1);
+    box-shadow: 
+        0 10px 40px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.05) inset;
 }
 
+/* --- Form Inputs --- */
 .admin-page input[type="text"],
 .admin-page input[type="number"],
 .admin-page input[type="date"],
 .admin-page input[type="time"],
 .admin-page select {
-    padding: 8px 10px;
-    font-size: 1em;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    padding: 14px 18px;
+    font-size: 1rem;
+    background: #0f172a;
+    border: 2px solid #334155;
+    border-radius: 10px;
     width: 100%;
     box-sizing: border-box;
-    transition: border-color 0.2s;
+    transition: all 0.3s ease;
+    color: #e5e7eb;
+    margin-bottom: 15px;
+}
+
+.admin-page input::placeholder {
+    color: #64748b;
 }
 
 .admin-page input:focus,
 .admin-page select:focus {
     outline: none;
-    border-color: #007bff;
+    border-color: #3b82f6;
+    background: #1e293b;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+}
+
+.admin-page select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 20px;
+    padding-right: 45px;
+}
+
+.admin-page select option {
+    background: #1e293b;
+    color: #e5e7eb;
+    padding: 10px;
 }
 
 /* --- Buttons --- */
 .admin-page button {
-    padding: 8px 12px;
+    padding: 12px 24px;
     border: none;
-    border-radius: 4px;
+    border-radius: 10px;
     cursor: pointer;
-    font-size: 0.95em;
-    transition: background-color 0.2s, transform 0.1s;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .admin-page button:hover {
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 }
 
 .admin-page button:active {
-    transform: translateY(1px);
+    transform: translateY(0);
 }
 
 button.primary {
-    background-color: #28a745;
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
     color: white;
+    box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
 }
 
 button.primary:hover {
-    background-color: #218838;
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
 }
 
 button.secondary {
-    background-color: #6c757d;
+    background: linear-gradient(135deg, #64748b 0%, #475569 100%);
     color: white;
+    box-shadow: 0 4px 15px rgba(100, 116, 139, 0.3);
 }
 
 button.secondary:hover {
-    background-color: #5a6268;
+    background: linear-gradient(135deg, #475569 0%, #334155 100%);
 }
 
 button.danger {
-    background-color: #dc3545;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
     color: white;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
 }
 
 button.danger:hover {
-    background-color: #c82333;
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
 }
 
 button.info {
-    background-color: #007bff;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
     color: white;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
 }
 
 button.info:hover {
-    background-color: #0069d9;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
 }
 
-/* --- Tables --- */
-.admin-page table {
+button.success {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+}
+
+button.success:hover {
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+}
+
+/* --- Form Grid Layout --- */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    margin-bottom: 0;
+}
+
+/* --- Textarea --- */
+.admin-page textarea {
+    padding: 14px 18px;
+    font-size: 1rem;
+    background: #0f172a;
+    border: 2px solid #334155;
+    border-radius: 10px;
     width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+    color: #e5e7eb;
+    resize: vertical;
+    min-height: 80px;
+    font-family: inherit;
+}
+
+.admin-page textarea::placeholder {
+    color: #64748b;
+}
+
+.admin-page textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background: #1e293b;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+}
+
+/* --- Form Actions --- */
+.form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+/* --- Image Upload Section --- */
+.upload-section {
+    display: flex;
+    gap: 25px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.upload-area {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.upload-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 28px;
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    color: white;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px dashed transparent;
+}
+
+.upload-btn:hover {
+    background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+}
+
+.upload-hint {
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+.preview-area {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+.poster-preview {
+    width: 150px;
+    height: 225px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 3px solid #334155;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.poster-url-display {
+    font-size: 0.75rem;
+    color: #4ade80;
+    max-width: 200px;
+    word-break: break-all;
+    text-align: center;
+    background: rgba(34, 197, 94, 0.1);
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+/* --- Action Buttons in Table --- */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.action-buttons button {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    text-transform: none;
+}
+
+/* --- Status Badges in Table --- */
+.status-active {
+    color: #4ade80 !important;
+    font-weight: 600;
+}
+
+.status-inactive {
+    color: #f87171 !important;
+    font-weight: 600;
+}
+
+/* --- Data Table --- */
+.admin-page table,
+.admin-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 20px;
+    background: #1e293b;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 
+        0 10px 40px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.05) inset;
 }
 
 .admin-page table th,
-.admin-page table td {
-    padding: 10px 8px;
-    border: 1px solid #ddd;
+.admin-page table td,
+.admin-table th,
+.admin-table td {
+    padding: 16px 20px;
     text-align: center;
     word-wrap: break-word;
 }
 
-.admin-page table th {
-    background-color: #f2f2f2;
-    font-weight: 600;
+.admin-page table th,
+.admin-table th {
+    background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+    color: #f1f5f9;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    border-bottom: 2px solid #3b82f6;
 }
 
-.admin-page table tr:nth-child(even) {
-    background-color: #fafafa;
+.admin-page table td,
+.admin-table td {
+    background: transparent;
+    color: #cbd5e1;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+    font-size: 0.95rem;
 }
 
-.admin-page table tr:hover {
-    background-color: #f1f1f1;
+.admin-page table tr:nth-child(even) td,
+.admin-table tr:nth-child(even) td {
+    background: rgba(15, 23, 42, 0.5);
+}
+
+.admin-page table tr:hover td,
+.admin-table tr:hover td {
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.admin-page table tr:last-child td,
+.admin-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* --- Table Status Badges --- */
+.admin-table td.status-success,
+.admin-page table td.status-success {
+    background: transparent !important;
+    border: none;
+}
+
+.admin-table td.status-success::before,
+.admin-page table td.status-success::before {
+    content: none;
+}
+
+.admin-table td.status-error,
+.admin-page table td.status-error {
+    background: transparent !important;
+    border: none;
+}
+
+.admin-table td.status-error::before,
+.admin-page table td.status-error::before {
+    content: none;
 }
 
 .table-actions {
@@ -171,55 +506,174 @@ button.info:hover {
 .seat-grid-map {
     display: flex;
     flex-wrap: wrap;
-    gap: 5px;
-    margin-top: 20px;
+    gap: 8px;
+    margin-top: 25px;
+    padding: 20px;
+    background: rgba(15, 23, 42, 0.5);
+    border-radius: 12px;
+    border: 1px solid rgba(148, 163, 184, 0.1);
 }
 
 .seat-box {
-    padding: 8px 12px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-weight: bold;
+    padding: 10px 14px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    font-weight: 600;
     cursor: pointer;
-    transition: transform 0.1s, background-color 0.2s;
+    transition: all 0.2s ease;
     text-align: center;
-    min-width: 40px;
+    min-width: 45px;
+    font-size: 0.9rem;
 }
 
 .seat-box:hover {
-    transform: scale(1.05);
+    transform: scale(1.08);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 .seat-standard {
-    background-color: lightgreen;
-    border-color: #28a745;
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    border-color: #22c55e;
+    color: white;
 }
 
 .seat-vip {
-    background-color: gold;
-    border-color: #ffc107;
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    border-color: #fbbf24;
+    color: #1a1a2e;
 }
 
 .seat-inactive {
-    background-color: #ddd;
-    border-color: #aaa;
+    background: #374151;
+    border-color: #4b5563;
+    color: #9ca3af;
     cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* --- Loading State --- */
+.admin-page .loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px;
+    color: #94a3b8;
+    font-size: 1.1rem;
+}
+
+.admin-page .loading::before {
+    content: '';
+    width: 24px;
+    height: 24px;
+    border: 3px solid #334155;
+    border-top-color: #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 12px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* --- Empty State --- */
+.admin-page .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #64748b;
+}
+
+.admin-page .empty-state::before {
+    content: '📭';
+    display: block;
+    font-size: 3rem;
+    margin-bottom: 15px;
 }
 
 /* --- Responsive Adjustments --- */
+@media (max-width: 1024px) {
+    .admin-page {
+        padding: 20px;
+    }
+
+    .admin-page form,
+    .admin-form {
+        padding: 20px;
+    }
+}
+
 @media (max-width: 768px) {
-    .admin-page form {
+    .admin-page h1 {
+        font-size: 1.6rem;
+    }
+
+    .admin-page h2 {
+        font-size: 1rem;
+    }
+
+    .admin-page form,
+    .admin-form {
         display: flex;
         flex-direction: column;
         gap: 10px;
+    }
+
+    .form-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .admin-page button {
+        width: 100%;
+        padding: 14px;
     }
 
     .seat-grid-map {
         justify-content: center;
     }
 
-    table th, table td {
-        font-size: 0.9em;
-        padding: 6px 4px;
+    .admin-page table,
+    .admin-table {
+        font-size: 0.85rem;
+        border-radius: 12px;
+    }
+
+    .admin-page table th,
+    .admin-page table td,
+    .admin-table th,
+    .admin-table td {
+        padding: 12px 8px;
+        font-size: 0.85rem;
+    }
+
+    /* Make table scrollable on mobile */
+    .table-wrapper {
+        overflow-x: auto;
+        border-radius: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-page {
+        padding: 15px 10px;
+    }
+
+    .admin-page h1 {
+        font-size: 1.4rem;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-page table th,
+    .admin-page table td,
+    .admin-table th,
+    .admin-table td {
+        padding: 10px 6px;
+        font-size: 0.8rem;
     }
 }
