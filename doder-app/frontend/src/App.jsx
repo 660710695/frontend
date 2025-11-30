@@ -11,6 +11,7 @@ import Home from "./pages/Home";
 import Cinema from "./pages/Cinema";
 import Movies from "./pages/Movies";
 import MovieDetail from "./pages/MovieDetail";
+import MoviesByGenre from "./pages/MoviesByGenre";
 import Profile from "./pages/Profile";
 import SeatPicker from "./components/SeatPicker";
 import CheckOut from "./pages/CheckOut";
@@ -36,6 +37,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/movies" element={<Movies />} />
           <Route path="/movies/:id" element={<MovieDetail />} />
+          <Route path="/movies/genre/:genre" element={<MoviesByGenre />} />
           <Route path="/cinema" element={<Cinema />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />

@@ -266,7 +266,7 @@ function Cinema() {
                   setSelectedCinema(c); 
               }}
             >
-              {c.cinema_name}
+              {c.address}
             </button>
           ))}
         </div>
