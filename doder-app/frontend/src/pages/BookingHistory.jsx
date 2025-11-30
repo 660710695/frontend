@@ -27,8 +27,22 @@ function BookingHistory() {
     };
 
     const formatTime = (timeStr) => {
-        if (!timeStr) return 'N/A';
-        return timeStr.substring(0, 5); // HH:MM
+        if (!timeStr) return '';
+        
+        // Handle ISO date string format (e.g., "0001-01-01T00:00:00Z")
+        if (typeof timeStr === 'string' && timeStr.includes('T')) {
+            const timePart = timeStr.split('T')[1];
+            if (timePart) {
+                return timePart.substring(0, 5);
+            }
+        }
+        
+        // Handle simple time format "HH:MM:SS" or "HH:MM"
+        if (typeof timeStr === 'string' && timeStr.includes(':') && !timeStr.includes('T')) {
+            return timeStr.substring(0, 5);
+        }
+        
+        return '';
     };
 
     const formatDateTime = (dateStr) => {

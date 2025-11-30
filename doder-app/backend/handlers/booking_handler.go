@@ -254,6 +254,48 @@ func (h *BookingHandler) GetBooking(c *gin.Context) {
 		return
 	}
 
+	// Fetch seats for this booking
+	seatsQuery := `
+		SELECT s.seat_id, s.seat_row, s.seat_number
+		FROM booking_seats bs
+		JOIN seats s ON bs.seat_id = s.seat_id
+		WHERE bs.booking_id = $1
+		ORDER BY s.seat_row, s.seat_number
+	`
+	seatsRows, err := h.db.Query(seatsQuery, bookingID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Success: false,
+			Error:   "Failed to fetch booking seats",
+		})
+		return
+	}
+	defer seatsRows.Close()
+
+	var seats []gin.H
+	for seatsRows.Next() {
+		var seatID int
+		var seatRow string
+		var seatNumber int
+		if err := seatsRows.Scan(&seatID, &seatRow, &seatNumber); err != nil {
+			continue
+		}
+		seats = append(seats, gin.H{
+			"seat_id":     seatID,
+			"seat_row":    seatRow,
+			"seat_number": seatNumber,
+		})
+	}
+
+	// Format show_date and show_time properly
+	var showDateStr, showTimeStr interface{}
+	if showDate.Valid {
+		showDateStr = showDate.Time.Format("2006-01-02")
+	}
+	if showTime.Valid {
+		showTimeStr = showTime.Time.Format("15:04")
+	}
+
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Data: gin.H{
@@ -264,12 +306,13 @@ func (h *BookingHandler) GetBooking(c *gin.Context) {
 			"movie_title":    movieTitle,
 			"cinema_name":    cinemaName,
 			"theater_name":   theaterName,
-			"show_date":      showDate,
-			"show_time":      showTime,
+			"show_date":      showDateStr,
+			"show_time":      showTimeStr,
 			"total_amount":   booking.TotalAmount,
 			"booking_status": booking.BookingStatus,
 			"payment_status": booking.PaymentStatus,
 			"booking_date":   booking.BookingDate,
+			"seats":          seats,
 		},
 	})
 }

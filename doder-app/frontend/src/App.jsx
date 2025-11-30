@@ -1,5 +1,4 @@
-// App.jsx (Finalized Routes with Admin Section)
-
+import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 
@@ -14,6 +13,7 @@ import MovieDetail from "./pages/MovieDetail";
 import MoviesByGenre from "./pages/MoviesByGenre";
 import Profile from "./pages/Profile";
 import BookingHistory from "./pages/BookingHistory";
+import BookingDetail from "./pages/BookingDetail";
 import SeatPicker from "./components/SeatPicker";
 import CheckOut from "./pages/CheckOut";
 import Success from "./pages/Success";
@@ -49,6 +49,7 @@ function App() {
           <Route path="/success" element={<ProtectedRoute><Success /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/booking-history" element={<ProtectedRoute><BookingHistory /></ProtectedRoute>} />
+          <Route path="/bookings/:id" element={<ProtectedRoute><BookingDetail /></ProtectedRoute>} />
 
           {/* 💥 ADMIN PROTECTED ROUTES (Admin Role Required) 💥 */}
 
