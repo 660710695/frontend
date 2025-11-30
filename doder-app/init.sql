@@ -188,7 +188,17 @@ VALUES
   ('My Boo 2', 'ภาคต่อของเรื่องราวความรักระหว่างมนุษย์กับผี ที่จะต้องเผชิญกับอุปสรรคใหม่', 105, ARRAY['Horror', 'Romance', 'Comedy'], 'ไทย', NULL, '/uploads/posters/my_boo_2.jpg', '2025-11-21', TRUE),
   ('Zootopia 2', 'การผจญภัยครั้งใหม่ของจูดี้ ฮอปส์ และนิค ไวลด์ ในเมืองที่สัตว์ทุกชนิดอยู่ร่วมกัน', 100, ARRAY['Animation', 'Adventure', 'Comedy', 'Family'], 'อังกฤษ', 'ไทย', '/uploads/posters/zootopia_2.jpg', '2025-11-27', TRUE),
   ('The Gunman', 'นักฆ่ามืออาชีพที่ต้องหนีไล่ล่าจากองค์กรลับ พร้อมเปิดเผยความจริงที่ถูกปิดบัง', 118, ARRAY['Action', 'Thriller'], 'อังกฤษ', 'ไทย', '/uploads/posters/the_gunman.jpg', '2025-11-15', TRUE),
-  ('4 เสือ (4 Tigers)', 'สี่เสือในจักรวาลขุนพันธ์ที่ต้องร่วมมือกันเพื่อปกป้องดินแดน เรื่องราวแอ็คชั่นสุดมันส์', 140, ARRAY['Action', 'Crime', 'Drama'], 'ไทย', NULL, '/uploads/posters/4_tigers.jpg', '2025-10-23', TRUE);
+  ('4 เสือ (4 Tigers)', 'สี่เสือในจักรวาลขุนพันธ์ที่ต้องร่วมมือกันเพื่อปกป้องดินแดน เรื่องราวแอ็คชั่นสุดมันส์', 140, ARRAY['Action', 'Crime', 'Drama'], 'ไทย', NULL, '/uploads/posters/4_tigers.jpg', '2025-10-23', TRUE),
+  ('Dune: Part One', 'เจ้าชายหนุ่มต้องเดินทางไปยังดาวทะเลทรายที่อันตรายที่สุดเพื่อปกป้องอนาคตของครอบครัว', 155, ARRAY['Sci-Fi', 'Adventure'], 'อังกฤษ', 'ไทย', '/uploads/posters/Dune.jpg', '2021-10-22', TRUE),
+  ('Oppenheimer', 'เรื่องราวของ เจ. โรเบิร์ต ออปเพนไฮเมอร์ ผู้นำโครงการแมนฮัตตันสร้างระเบิดปรมาณู', 180, ARRAY['Biography', 'Drama'], 'อังกฤษ', 'ไทย', '/uploads/posters/oppenheimer.jpg', '2023-07-21', TRUE),
+  ('Top Gun: Maverick', 'พีท มาเวอริค กลับมาฝึกนักบินรุ่นใหม่สำหรับภารกิจสุดเสี่ยง', 131, ARRAY['Action', 'Drama'], 'อังกฤษ', 'ไทย', '/uploads/posters/3.jpg', '2022-05-27', TRUE),
+  ('Everything Everywhere All at Once', 'หญิงนักทำบัญชีถูกดึงเข้าสู่การผจญภัยสุดบ้าคลั่งในมัลติเวิร์สเพื่อกอบกู้โลก', 139, ARRAY['Sci-Fi', 'Comedy', 'Action'], 'อังกฤษ', 'ไทย', '/uploads/posters/4.jpg', '2022-03-25', TRUE),
+  ('Extraction', 'ทหารรับจ้างต้องทำภารกิจอันตรายเพื่อช่วยบุตรชายของเจ้าพ่อค้ายาที่ถูกลักพาตัว', 117, ARRAY['Action', 'Thriller'], 'อังกฤษ', 'ไทย', '/uploads/posters/5.jpg', '2020-04-24', TRUE),
+  ('Godzilla Minus One', 'ญี่ปุ่นหลังสงครามต้องเผชิญหน้ากับภัยครั้งใหม่จากก็อดซิลลายักษ์', 124, ARRAY['Action', 'Sci-Fi'], 'ญี่ปุ่น', 'ไทย', '/uploads/posters/6.jpg', '2023-12-01', TRUE),
+  ('Black Panther: Wakanda Forever', 'วาคานด้าปกป้องประเทศจากภัยคุกคามใหม่หลังการจากไปของกษัตริย์', 161, ARRAY['Superhero', 'Action', 'Drama'], 'อังกฤษ', 'ไทย', '/uploads/posters/7.jpg', '2022-11-11', TRUE),
+  ('Parasite', 'ครอบครัวยากจนแทรกซึมเข้าไปในชีวิตของครอบครัวร่ำรวยจนเกิดเหตุไม่คาดฝัน', 132, ARRAY['Drama', 'Thriller'], 'เกาหลี', 'ไทย', '/uploads/posters/8.jpg', '2020-02-07', TRUE),
+  ('Cruella', 'เรื่องราวเบื้องหลังของวายร้ายสุดชิค ครูเอลลา เดอ วิล ในช่วงปี 1970 ณ ลอนดอน', 134, ARRAY['Comedy', 'Crime'], 'อังกฤษ', 'ไทย', '/uploads/posters/9.jpg', '2021-05-28', TRUE),
+  ('A Quiet Place Part II', 'ครอบครัวแอ๊บบอตต้องออกเดินทางเผชิญหน้ากับความน่าสะพรึงกลัวของโลกภายนอก', 97, ARRAY['Horror', 'Sci-Fi'], 'อังกฤษ', 'ไทย', '/uploads/posters/10.jpg', '2021-05-28', TRUE);
 
 -- รอบฉาย
 INSERT INTO showtimes (movie_id, theater_id, show_date, show_time, end_time, price, available_seats, is_active)
@@ -227,4 +237,94 @@ VALUES
 
   ((SELECT movie_id FROM movies WHERE title = 'The Gunman'),
    (SELECT theater_id FROM theaters WHERE theater_name='โรง 2' AND cinema_id=(SELECT cinema_id FROM cinemas WHERE address='Lotus Nakhon Pathom')),
-   '2025-11-21','21:30','23:28',250.00,150,TRUE);
+   '2025-11-21','21:30','23:28',250.00,150,TRUE),
+
+  -- Dune: Part One
+  ((SELECT movie_id FROM movies WHERE title = 'Dune: Part One'),
+   (SELECT theater_id FROM theaters WHERE theater_name='โรง 1' AND cinema_id=(SELECT cinema_id FROM cinemas WHERE address='Central Nakhon Pathom')),
+   '2025-12-01','13:00','15:35',220.00,150,TRUE),
+
+  ((SELECT movie_id FROM movies WHERE title = 'Dune: Part One'),
+   (SELECT theater_id FROM theaters WHERE theater_name='โรง 2' AND cinema_id=(SELECT cinema_id FROM cinemas WHERE address='Lotus Nakhon Pathom')),
+   '2025-12-01','19:30','22:05',220.00,150,TRUE),
+
+  -- Oppenheimer
+  ((SELECT movie_id FROM movies WHERE title = 'Oppenheimer'),
+   (SELECT theater_id FROM theaters WHERE theater_name='โรง 2' AND cinema_id=(SELECT cinema_id FROM cinemas WHERE address='Central Nakhon Pathom')),
+   '2025-12-02','11:00','14:00',250.00,150,TRUE),
+
+  ((SELECT movie_id FROM movies WHERE title = 'Oppenheimer'),
+   (SELECT theater_id FROM theaters WHERE theater_name='โรง 1' AND cinema_id=(SELECT cinema_id FROM cinemas WHERE address='Lotus Nakhon Pathom')),
+   '2025-12-02','20:30','23:30',250.00,150,TRUE),
+
+  -- Top Gun: Maverick
+  ((SELECT movie_id FROM movies WHERE title = 'Top Gun: Maverick'),
+   (SELECT theater_id FROM theaters WHERE theater_name='โรง 1' AND cinema_id=(SELECT cinema_id FROM cinemas WHERE address='Central Nakhon Pathom')),
+   '2025-12-03','15:30','17:41',200.00,150,TRUE),
+
+  ((SELECT movie_id FROM movies WHERE title = 'Top Gun: Maverick'),
+   (SELECT theater_id FROM theaters WHERE theater_name='โรง 2' AND cinema_id=(SELECT cinema_id FROM cinemas WHERE address='Central Nakhon Pathom')),
+   '2025-12-03','20:00','22:11',200.00,150,TRUE),
+
+  -- Everything Everywhere All at Once
+  ((SELECT movie_id FROM movies WHERE title = 'Everything Everywhere All at Once'),
+   (SELECT theater_id FROM theaters WHERE theater_name='โรง 1' AND cinema_id=(SELECT cinema_id FROM cinemas WHERE address='Lotus Nakhon Pathom')),
+   '2025-12-04','12:00','14:19',180.00,150,TRUE),
+
+  ((SELECT movie_id FROM movies WHERE title = 'Everything Everywhere All at Once'),
+   (SELECT theater_id FROM theaters WHERE theater_name='โรง 2' AND cinema_id=(SELECT cinema_id FROM cinemas WHERE address='Lotus Nakhon Pathom')),
+   '2025-12-04','17:00','19:19',180.00,150,TRUE),
+
+  -- Extraction
+  ((SELECT movie_id FROM movies WHERE title = 'Extraction'),
+   (SELECT theater_id FROM theaters WHERE theater_name='โรง 2' AND cinema_id=(SELECT cinema_id FROM cinemas WHERE address='Central Nakhon Pathom')),
+   '2025-12-05','14:30','16:27',180.00,150,TRUE),
+
+  ((SELECT movie_id FROM movies WHERE title = 'Extraction'),
+   (SELECT theater_id FROM theaters WHERE theater_name='โรง 1' AND cinema_id=(SELECT cinema_id FROM cinemas WHERE address='Lotus Nakhon Pathom')),
+   '2025-12-05','21:00','22:57',180.00,150,TRUE),
+
+  -- Godzilla Minus One
+  ((SELECT movie_id FROM movies WHERE title = 'Godzilla Minus One'),
+   (SELECT theater_id FROM theaters WHERE theater_name='โรง 1' AND cinema_id=(SELECT cinema_id FROM cinemas WHERE address='Central Nakhon Pathom')),
+   '2025-12-06','16:00','18:04',220.00,150,TRUE),
+
+  ((SELECT movie_id FROM movies WHERE title = 'Godzilla Minus One'),
+   (SELECT theater_id FROM theaters WHERE theater_name='โรง 2' AND cinema_id=(SELECT cinema_id FROM cinemas WHERE address='Lotus Nakhon Pathom')),
+   '2025-12-06','19:00','21:04',220.00,150,TRUE),
+
+  -- Black Panther: Wakanda Forever
+  ((SELECT movie_id FROM movies WHERE title = 'Black Panther: Wakanda Forever'),
+   (SELECT theater_id FROM theaters WHERE theater_name='โรง 2' AND cinema_id=(SELECT cinema_id FROM cinemas WHERE address='Central Nakhon Pathom')),
+   '2025-12-07','15:00','17:41',220.00,150,TRUE),
+
+  ((SELECT movie_id FROM movies WHERE title = 'Black Panther: Wakanda Forever'),
+   (SELECT theater_id FROM theaters WHERE theater_name='โรง 1' AND cinema_id=(SELECT cinema_id FROM cinemas WHERE address='Lotus Nakhon Pathom')),
+   '2025-12-07','18:30','21:11',220.00,150,TRUE),
+
+  -- Parasite
+  ((SELECT movie_id FROM movies WHERE title = 'Parasite'),
+   (SELECT theater_id FROM theaters WHERE theater_name='โรง 1' AND cinema_id=(SELECT cinema_id FROM cinemas WHERE address='Central Nakhon Pathom')),
+   '2025-12-08','14:00','16:12',180.00,150,TRUE),
+
+  ((SELECT movie_id FROM movies WHERE title = 'Parasite'),
+   (SELECT theater_id FROM theaters WHERE theater_name='โรง 2' AND cinema_id=(SELECT cinema_id FROM cinemas WHERE address='Central Nakhon Pathom')),
+   '2025-12-08','18:00','20:12',180.00,150,TRUE),
+
+  -- Cruella
+  ((SELECT movie_id FROM movies WHERE title = 'Cruella'),
+   (SELECT theater_id FROM theaters WHERE theater_name='โรง 1' AND cinema_id=(SELECT cinema_id FROM cinemas WHERE address='Lotus Nakhon Pathom')),
+   '2025-12-09','13:30','15:44',180.00,150,TRUE),
+
+  ((SELECT movie_id FROM movies WHERE title = 'Cruella'),
+   (SELECT theater_id FROM theaters WHERE theater_name='โรง 2' AND cinema_id=(SELECT cinema_id FROM cinemas WHERE address='Lotus Nakhon Pathom')),
+   '2025-12-09','19:00','21:14',180.00,150,TRUE),
+
+  -- A Quiet Place Part II
+  ((SELECT movie_id FROM movies WHERE title = 'A Quiet Place Part II'),
+   (SELECT theater_id FROM theaters WHERE theater_name='โรง 2' AND cinema_id=(SELECT cinema_id FROM cinemas WHERE address='Central Nakhon Pathom')),
+   '2025-12-10','17:30','19:07',180.00,150,TRUE),
+
+  ((SELECT movie_id FROM movies WHERE title = 'A Quiet Place Part II'),
+   (SELECT theater_id FROM theaters WHERE theater_name='โรง 1' AND cinema_id=(SELECT cinema_id FROM cinemas WHERE address='Lotus Nakhon Pathom')),
+   '2025-12-10','21:30','23:07',180.00,150,TRUE);

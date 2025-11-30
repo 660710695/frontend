@@ -1,7 +1,7 @@
 /* responsive grid: 1 col default, 2 cols >=768px, 3 cols >=1024px */
 .featured-grid {
   display: grid;
-  gap: 2rem;
+  gap: 2.5rem;
   grid-template-columns: 1fr;
   padding: 0 1rem;
 }
@@ -10,9 +10,10 @@
   text-align: center;
   padding: 2rem 0;
   grid-column: 1 / -1;
+  color: rgba(255, 255, 255, 0.7);
 }
 
-.center-full.error { color: #dc2626; /* red-600 */ }
+.center-full.error { color: #ef4444; }
 
 @media (min-width: 768px) {
   .featured-grid {

@@ -1,15 +1,20 @@
 /* ...existing code... */
 :root {
   --accent: #f59e0b;
-  --primary-dark: #0f172a;
+  --accent-light: #fbbf24;
+  --primary-dark: #1a0a1f;
+  --secondary-dark: #2b0547;
+  --tertiary-dark: #410707;
   --muted: #94a3b8;
   --container-max: 1100px;
+  --gradient-main: linear-gradient(135deg, #1a0a1f 0%, #2b0547 50%, #410707 100%);
 }
 
 .home-root {
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  color: var(--primary-dark);
-  background: #ffffff;
+  color: #ffffff;
+  background: var(--gradient-main);
+  min-height: 100vh;
 }
 
 /* container */
@@ -21,82 +26,97 @@
 
 /* Hero */
 .hero {
-  position: relative; /* Keep this if needed for children, but remove z-index */
-  /* NO z-index property here */
-  background: linear-gradient(0deg,#2b0547, #410707);
+  position: relative;
+  background: transparent;
   color: #ffffff;
-
-  /* CRITICAL: The wave element below the hero also has a position */
-  overflow: visible; 
+  overflow: visible;
+  padding: 2rem 0;
 }
 
 .hero-inner {
   display: flex;
   gap: 2rem;
   align-items: center;
-  min-height: 260px;
+  justify-content: center;
+  min-height: 220px;
+  text-align: center;
 }
 
 .hero-content {
   flex: 1 1 520px;
-  max-width: 720px;
+  max-width: 800px;
 }
 
 .hero-title {
-  font-size: 2rem;
-  margin: 0 0 0.75rem;
+  font-size: 2.2rem;
+  margin: 0 0 1rem;
   font-weight: 800;
-  line-height: 1.02;
+  line-height: 1.15;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 @media (min-width: 768px) {
-  .hero-title { font-size: 3rem; }
+  .hero-title { font-size: 3.5rem; }
 }
 
-.highlight { color: var(--accent); }
+.highlight { 
+  color: var(--accent); 
+  text-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
+}
 
 .hero-sub {
-  font-size: 1.05rem;
-  margin: 0 0 1.25rem;
-  color: rgba(255, 255, 255, 0.85);
+  font-size: 1.1rem;
+  margin: 0 0 1.75rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .hero-wave svg path {
-  fill: #94a3b8; /* ✅ this works */
+  fill: transparent;
 }
+
 /* Buttons */
 .hero-actions {
   display: flex;
-  gap: 0.75rem;
+  gap: 1rem;
   flex-wrap: wrap;
+  justify-content: center;
 }
 
 .btn {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.6rem 1rem;
-  border-radius: 10px;
+  padding: 0.85rem 1.75rem;
+  border-radius: 30px;
   text-decoration: none;
   font-weight: 700;
-  transition: transform .18s ease, box-shadow .18s ease;
+  font-size: 1rem;
+  transition: all 0.3s ease;
 }
 
 .btn-primary {
-  background: #ffffff;
-  color: #065f46;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  background: linear-gradient(135deg, var(--accent) 0%, #f59e0b 100%);
+  color: #1a0a1f;
+  box-shadow: 0 8px 24px rgba(251, 191, 36, 0.35);
 }
 
-.btn-primary:hover { transform: translateY(-3px); }
+.btn-primary:hover { 
+  transform: translateY(-4px); 
+  box-shadow: 0 12px 32px rgba(251, 191, 36, 0.5);
+}
 
 .btn-outline {
   background: transparent;
   color: #ffffff;
-  border: 2px solid rgba(255,255,255,0.9);
+  border: 2px solid rgba(255, 255, 255, 0.6);
 }
 
-.btn-outline:hover { background: #94a3b8; transform: translateY(-3px); }
+.btn-outline:hover { 
+  background: rgba(255, 255, 255, 0.15); 
+  border-color: #ffffff;
+  transform: translateY(-4px); 
+}
 
 .arrow { display: inline-block; transition: transform .18s ease; }
 .btn-primary:hover .arrow,
@@ -104,49 +124,59 @@
 
 /* hero wave */
 .hero-wave {
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  width: 100%;
-  pointer-events: none;
+  display: none;
 }
 
 /* Featured section */
 .featured-section {
-  background: #f8fafc;
-  padding: 2.5rem 0;
+  background: rgba(26, 10, 31, 0.6);
+  padding: 3rem 0;
+  backdrop-filter: blur(10px);
 }
 
 .section-title {
   text-align: center;
-  font-size: 48px;
+  font-size: 2.5rem;
   margin: 0 0 1rem;
   margin-bottom: 40px;
   font-weight: 800;
+  color: #ffffff;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 /* FeaturedMovies provides its own grid; keep spacing here */
 .view-all {
   text-align: center;
-  margin-top: 1rem;
+  margin-top: 2rem;
   font-size: 1.05rem;
 }
 
 .view-all-link {
-  color: #065f46;
+  color: var(--accent);
   font-weight: 700;
   text-decoration: none;
+  padding: 0.75rem 1.5rem;
+  border: 2px solid var(--accent);
+  border-radius: 25px;
+  transition: all 0.3s ease;
+}
+
+.view-all-link:hover {
+  background: var(--accent);
+  color: #1a0a1f;
 }
 
 /* Categories */
 .categories-section {
-  padding: 1.75rem 0 3rem;
+  padding: 3rem 0 4rem;
+  background: rgba(43, 5, 71, 0.4);
 }
 
 .section-title.small {
-  font-size: 1.1rem;
-  margin-bottom: 1rem;
-  text-align: left;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  color: #ffffff;
 }
 
 .categories-grid {
@@ -162,30 +192,36 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.9rem;
-  background: #fff;
-  border-radius: 10px;
+  padding: 1rem 1.2rem;
+  background: linear-gradient(135deg, rgba(65, 7, 7, 0.8) 0%, rgba(43, 5, 71, 0.8) 100%);
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  border-radius: 12px;
   text-decoration: none;
-  color: inherit;
-  box-shadow: 0 6px 18px rgba(2,6,23,0.03);
-  transition: transform .14s ease, box-shadow .14s ease;
+  color: #ffffff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
 }
 
 .category-card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 12px 30px rgba(2,6,23,0.06);
+  box-shadow: 0 16px 40px rgba(251, 191, 36, 0.15);
+  border-color: var(--accent);
+  background: linear-gradient(135deg, rgba(65, 7, 7, 1) 0%, rgba(43, 5, 71, 1) 100%);
 }
 
 .cat-icon {
-  font-size: 1.4rem;
-  width: 44px;
-  height: 44px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background: #f1f5f9;
-  border-radius: 8px;
+  font-size: 1.6rem;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.2) 0%, rgba(245, 158, 11, 0.1) 100%);
+  border-radius: 10px;
 }
 
-.cat-name { font-weight: 700; }
+.cat-name { 
+  font-weight: 700; 
+  font-size: 1rem;
+}
 
