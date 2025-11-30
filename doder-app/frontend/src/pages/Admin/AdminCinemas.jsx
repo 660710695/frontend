@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import '../../styles/AdminCinema.css'; // ✅ Import CSS
+import '../../styles/AdminCommon.css'; // ✅ Import CSS
 
 const API_BASE_URL = "/api";
 
@@ -186,7 +186,6 @@ function AdminCinemas() {
     if (loading) return <div className="admin-page">Loading cinema management data...</div>;
 
     return (
-        <div className="admin-container">
         <div className="admin-page">
             <h1>จัดการโรงภาพยนตร์</h1>
 
@@ -234,7 +233,7 @@ function AdminCinemas() {
                             <td className={c.is_active ? 'status-success' : 'status-error'}>
                                 {c.is_active ? 'เปิดใช้งาน' : 'ปิดใช้งาน'}
                             </td>
-                            <td style={{ gap: '5px', justifyContent: 'center' }}>
+                            <td style={{ display: 'flex', gap: '5px', flexWrap: 'wrap', justifyContent: 'center' }}>
                                 <button className="info" onClick={() => handleManageTheaters(c.cinema_id)}>จัดการห้องฉาย</button>
                                 <button className="primary" onClick={() => handleEditClick(c)}>แก้ไข</button>
                                 <button className={c.is_active ? 'danger' : 'primary'} onClick={() => handleDeleteCinema(c.cinema_id, c.is_active)}>
@@ -245,7 +244,6 @@ function AdminCinemas() {
                     ))}
                 </tbody>
             </table>
-        </div>
         </div>
     );
 }

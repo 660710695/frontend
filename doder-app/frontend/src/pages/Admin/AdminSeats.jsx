@@ -115,25 +115,20 @@ function AdminSeats() {
     };
 
     if (theaterId === 0) return (
-        <div className='admin-container'>
         <div className="admin-page">
             <div className="status-error">
                 🚫 Error: Theater ID is missing. Please navigate from the Theater Management page.
             </div>
         </div>
-        </div>
     );
 
     if (loading) return (
-        <div className='admin-container'>
         <div className="admin-page">
             <div className="admin-loading">Loading seat layout for Theater ID {theaterId}...</div>
-        </div>
         </div>
     );
 
     return (
-        <div className='admin-container'>
         <div className="admin-page">
             <h1>จัดการที่นั่ง (Theater ID: {theaterId})</h1>
 
@@ -184,7 +179,6 @@ function AdminSeats() {
                     ))}
                 </div>
             )}
-        </div>
         </div>
     );
 }

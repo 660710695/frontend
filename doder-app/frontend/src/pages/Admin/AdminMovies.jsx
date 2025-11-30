@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import '../../styles/AdminMovies.css';
+import '../../styles/AdminCommon.css';
 
 const API_BASE_URL = "/api";
 
@@ -33,6 +33,7 @@ function AdminMovies() {
 
     const getToken = () => localStorage.getItem('authToken');
 
+    // --- Fetch all movies ---
     const fetchMovies = async () => {
         if (!isAdmin) {
             setLoading(false);
@@ -75,8 +76,6 @@ function AdminMovies() {
         const { name, value } = e.target;
         setNewMovie(prev => ({ ...prev, [name]: name === 'duration' ? parseInt(value, 10) || '' : value }));
     };
-
-    const formatDateForInput = (dateStr) => dateStr ? dateStr.split('T')[0] : '';
 
     const handleEditClick = (movie) => {
         // Check movie.genres instead of movie.genre
@@ -269,6 +268,7 @@ function AdminMovies() {
     };
 
     if (isAuthLoading) return <div className="admin-page">กำลังโหลดการตรวจสอบสิทธิ์...</div>;
+
     if (!isAdmin) {
         return (
             <div className="admin-page">
@@ -278,10 +278,10 @@ function AdminMovies() {
             </div>
         );
     }
+
     if (loading) return <div className="admin-page">Loading movie data...</div>;
 
     return (
-        <div className='admin-container'>
         <div className="admin-page">
             <h1>จัดการภาพยนตร์</h1>
 
@@ -397,9 +397,6 @@ function AdminMovies() {
                         <th>ชื่อภาพยนตร์</th>
                         <th>ระยะเวลา</th>
                         <th>ประเภท</th>
-                        <th>ภาษา</th>
-                        <th>คำบรรยาย</th>
-                        <th>วันที่เข้าฉาย</th>
                         <th>สถานะ</th>
                         <th>จัดการ</th>
                     </tr>
@@ -441,7 +438,6 @@ function AdminMovies() {
                     ))}
                 </tbody>
             </table>
-        </div>
         </div>
     );
 }

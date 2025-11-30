@@ -200,7 +200,6 @@ function AdminTheaters() {
     if (loading) return <div className="admin-loading">Loading theater data...</div>;
 
     return (
-        <div className='admin-container'>
         <div className="admin-page">
             <h1>จัดการห้องฉาย</h1>
 
@@ -231,11 +230,11 @@ function AdminTheaters() {
                         <option key={c.cinema_id} value={String(c.cinema_id)}>{c.cinema_name}</option>
                     ))}
                 </select>
-
+                
                 {/* 💥 CRITICAL FIX: ADD THEATER TYPE SELECT 💥 */}
-                <select
-                    name="theater_type"
-                    value={newTheater.theater_type}
+                <select 
+                    name="theater_type" 
+                    value={newTheater.theater_type} 
                     onChange={handleInputChange}
                     required
                 >
@@ -274,22 +273,19 @@ function AdminTheaters() {
                             <td className={t.is_active ? 'status-success' : 'status-error'}>
                                 {t.is_active ? 'เปิดใช้งาน' : 'ปิดใช้งาน'}
                             </td>
-                            <td>
-                            
-                                    <button className="info" onClick={() => handleEditClick(t)}>แก้ไข</button>
-                                    <button className={t.is_active ? 'danger' : 'primary'} onClick={() => handleDeleteTheater(t.theater_id, t.is_active)}>
-                                        {t.is_active ? 'ปิดใช้งาน' : 'เปิดใช้งาน'}
-                                    </button>
-                                    <button className="secondary" onClick={() => navigate(`/admin/seats?theater_id=${t.theater_id}`)}>
-                                        จัดการที่นั่ง
-                                    </button>
-                                
+                            <td style={{ display: 'flex', gap: '5px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                                <button className="primary" onClick={() => handleEditClick(t)}>แก้ไข</button>
+                                <button className={t.is_active ? 'danger' : 'primary'} onClick={() => handleDeleteTheater(t.theater_id, t.is_active)}>
+                                    {t.is_active ? 'ปิดใช้งาน' : 'เปิดใช้งาน'}
+                                </button>
+                                <button className="secondary" onClick={() => navigate(`/admin/seats?theater_id=${t.theater_id}`)}>
+                                    จัดการที่นั่ง
+                                </button>
                             </td>
                         </tr>
                     ))}
                 </tbody>
             </table>
-        </div>
         </div>
     );
 }

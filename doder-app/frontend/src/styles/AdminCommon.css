@@ -4,20 +4,14 @@
 
 /* --- Main Container --- */
 .admin-page {
-    max-width: 1200px;
-    background-color: #ffffff;
+    max-width: 1400px;
     margin: 0 auto;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #000000;
-    padding: 30px;
-}
-.admin-container {
-  min-height: 100vh;
-  padding: 40px 20px;
-  background-color: #ffffff;
-  color: #000000;
-  font-family: 'Segoe UI', Roboto, sans-serif;
-  text-align: center;
+    padding: 30px 40px;
+    font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: #e5e7eb;
+    background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+    min-height: 100vh;
+    box-sizing: border-box;
 }
 
 /* --- Page Header --- */
@@ -486,20 +480,6 @@ button.success:hover {
 .admin-table td.status-error::before,
 .admin-page table td.status-error::before {
     content: none;
-}
-
-.table-actions {
-    display: flex;       /* ⬅️ เปิดใช้งาน Flexbox ที่นี่ */
-    gap: 5px;            /* ระยะห่างระหว่างปุ่ม */
-    justify-content: center; /* จัดกลุ่มปุ่มให้อยู่ตรงกลางเซลล์ */
-    align-items: center; 
-    flex-wrap: wrap;     /* ให้ปุ่มขึ้นบรรทัดใหม่ได้หากเซลล์แคบ */
-}
-
-/* ปรับขนาดปุ่มให้เล็กลงสำหรับใช้ในตาราง (ไม่บังคับ) */
-.admin-page table .table-actions button {
-    padding: 6px 10px;
-    font-size: 0.85em; 
 }
 
 /* --- Seat Grid Map --- */

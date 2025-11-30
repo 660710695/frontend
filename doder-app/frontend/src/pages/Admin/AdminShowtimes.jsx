@@ -221,7 +221,6 @@ function AdminShowtimes() {
     if (loading) return <div className="admin-page">Loading showtime data...</div>;
 
     return (
-        <div className='admin-container'>
         <div className="admin-page">
             <h1>จัดการรอบฉาย</h1>
 
@@ -296,7 +295,6 @@ function AdminShowtimes() {
                     ))}
                 </tbody>
             </table>
-        </div>
         </div>
     );
 }
