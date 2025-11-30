@@ -1,135 +1,292 @@
+/* ========================================
+   CINEMA PAGE - Purple-Red Theme (Same as Home & Movies)
+   ======================================== */
+
+:root {
+  --cinema-accent: #f59e0b;
+  --cinema-accent-light: #fbbf24;
+  --cinema-primary-dark: #1a0a1f;
+  --cinema-secondary-dark: #2b0547;
+  --cinema-tertiary-dark: #410707;
+  --cinema-muted: #94a3b8;
+}
+
 /* Root container */
 .cinema-page {
-  background-color: #ffffff;
-  color: #000000;
+  background: transparent;
+  color: #ffffff;
   min-height: 100vh;
-  padding: 30px 20px;
-  font-family: 'Segoe UI', Roboto, sans-serif;
+  padding: 40px 30px;
+  font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
+/* Page Title */
 .cinema-page h1 {
-  font-size: 2.2rem;
+  font-size: 2.8rem;
+  font-weight: 800;
   text-align: center;
-  margin-bottom: 30px;
-  color: #000000;
+  margin-bottom: 45px;
+  color: #ffffff;
+  letter-spacing: 1px;
+  position: relative;
+  padding-bottom: 18px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
+.cinema-page h1::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, #fbbf24, #f59e0b);
+  border-radius: 2px;
+}
+
+/* Section Titles */
+.cinema-page h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #fbbf24;
+  margin: 40px 0 25px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  text-align: center;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Cinema List - Location Buttons */
 .cinema-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 15px;
+  gap: 12px;
   justify-content: center;
-  margin-bottom: 30px;
+  margin-bottom: 50px;
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .cinema-list button {
-  background-color: #1c1c1c;
-  color: #f0f0f0;
-  border: 2px solid #333;
-  border-radius: 8px;
-  padding: 12px 20px;
+  background: linear-gradient(135deg, #1e1e2e 0%, #2d2d44 100%);
+  color: #ffffff;
+  border: 2px solid rgba(251, 191, 36, 0.4);
+  border-radius: 12px;
+  padding: 14px 22px;
   cursor: pointer;
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 0.85rem;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.cinema-list button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .cinema-list button:hover {
-  transform: scale(1.05);
+  transform: translateY(-3px);
   border-color: #fbbf24;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 8px 25px rgba(251, 191, 36, 0.3);
+  background: linear-gradient(135deg, #2a2a42 0%, #3d3d5c 100%);
+}
+
+.cinema-list button:hover::before {
+  opacity: 1;
 }
 
 .cinema-list button.active {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
   border-color: #fbbf24;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+  color: #1a0a1f;
+  box-shadow: 0 8px 30px rgba(251, 191, 36, 0.5);
+  font-weight: 700;
+}
+
+.cinema-list button.active::before {
+  opacity: 0;
 }
 
 /* Selection Details Section */
 .selection-details {
-  max-width: 800px;
+  max-width: 1000px;
   margin: 0 auto;
   text-align: center;
+  background: linear-gradient(135deg, rgba(43, 5, 71, 0.8) 0%, rgba(65, 7, 7, 0.8) 100%);
+  padding: 40px;
+  border-radius: 20px;
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
 }
 
-/* MovieFirstShowtimePicker / CinemaFirstMovieSelector */
+/* Date / Time Lists */
 .date-list, .time-list, .movie-selection-list {
   display: flex;
   flex-wrap: wrap;
   gap: 15px;
   justify-content: center;
-  margin-top: 20px;
+  margin-top: 25px;
 }
 
 .date-list button,
-.time-list .time-btn,
-.movie-selection-list .movie-item button {
-  background-color: #1c1c1c;
-  color: #f0f0f0;
-  border: 2px solid #333;
-  border-radius: 8px;
-  padding: 12px 20px;
+.time-list .time-btn {
+  background: linear-gradient(135deg, rgba(26, 10, 31, 0.9) 0%, rgba(43, 5, 71, 0.9) 100%);
+  color: #ffffff;
+  border: 2px solid rgba(251, 191, 36, 0.3);
+  border-radius: 10px;
+  padding: 14px 24px;
   cursor: pointer;
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 0.95rem;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 .date-list button:hover,
-.time-list .time-btn:hover,
-.movie-selection-list .movie-item button:hover {
-  transform: scale(1.05);
+.time-list .time-btn:hover {
+  transform: translateY(-2px);
   border-color: #fbbf24;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 8px 25px rgba(251, 191, 36, 0.25);
+  background: linear-gradient(135deg, rgba(43, 5, 71, 1) 0%, rgba(65, 7, 7, 1) 100%);
 }
 
 .date-list button.active {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
   border-color: #fbbf24;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+  color: #1a0a1f;
+  box-shadow: 0 8px 30px rgba(251, 191, 36, 0.5);
+  font-weight: 700;
 }
 
 /* Movie items */
 .movie-selection-list .movie-item {
-  background-color: #1c1c1c;
-  padding: 15px 20px;
-  border-radius: 10px;
-  box-shadow: 0 6px 15px rgba(0,0,0,0.7);
-  min-width: 180px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: linear-gradient(135deg, rgba(26, 10, 31, 0.95) 0%, rgba(43, 5, 71, 0.95) 100%);
+  padding: 25px 30px;
+  border-radius: 16px;
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  min-width: 200px;
+  max-width: 280px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.movie-selection-list .movie-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
 }
 
 .movie-selection-list .movie-item:hover {
-  transform: scale(1.03);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+  border-color: rgba(251, 191, 36, 0.4);
 }
 
 .movie-selection-list .movie-item h3 {
-  font-size: 1.1rem;
-  margin-bottom: 10px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 18px;
   color: #fbbf24;
+  line-height: 1.4;
+}
+
+.movie-selection-list .movie-item button {
+  background: linear-gradient(135deg, rgba(65, 7, 7, 0.9) 0%, rgba(43, 5, 71, 0.9) 100%);
+  color: #ffffff;
+  border: 2px solid rgba(251, 191, 36, 0.3);
+  border-radius: 10px;
+  padding: 12px 24px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.movie-selection-list .movie-item button:hover {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  border-color: #fbbf24;
+  color: #1a0a1f;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(251, 191, 36, 0.4);
 }
 
 /* Loading / error messages */
 .cinema-page p {
   text-align: center;
-  font-size: 1.2rem;
-  margin-top: 20px;
-  color: #ccc;
+  font-size: 1.1rem;
+  margin-top: 25px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Empty State */
+.cinema-page .no-data {
+  text-align: center;
+  padding: 40px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1rem;
+}
+
+/* Time Button Active State */
+.time-list .time-btn.selected {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  border-color: #22c55e;
+  color: #ffffff;
+  box-shadow: 0 8px 30px rgba(34, 197, 94, 0.4);
 }
 
 /* Responsive styling */
+@media screen and (max-width: 1024px) {
+  .cinema-page {
+    padding: 30px 20px;
+  }
+
+  .selection-details {
+    padding: 25px 20px;
+  }
+}
+
 @media screen and (max-width: 768px) {
+  .cinema-page h1 {
+    font-size: 2rem;
+  }
+
+  .cinema-list button {
+    padding: 12px 16px;
+    font-size: 0.8rem;
+  }
+
   .date-list button,
-  .time-list .time-btn,
-  .movie-selection-list .movie-item button {
-    padding: 10px 15px;
-    font-size: 0.95rem;
+  .time-list .time-btn {
+    padding: 12px 18px;
+    font-size: 0.9rem;
   }
 
   .movie-selection-list .movie-item {
-    min-width: 140px;
+    min-width: 160px;
+    padding: 20px;
   }
 
-  .cinema-page h1 {
-    font-size: 1.9rem;
+  .movie-selection-list .movie-item h3 {
+    font-size: 1rem;
   }
 }
 
@@ -138,14 +295,38 @@
     font-size: 1.6rem;
   }
 
+  .cinema-page h2 {
+    font-size: 1.1rem;
+  }
+
+  .cinema-list {
+    gap: 8px;
+  }
+
+  .cinema-list button {
+    padding: 10px 12px;
+    font-size: 0.75rem;
+    border-radius: 8px;
+  }
+
   .date-list button,
-  .time-list .time-btn,
-  .movie-selection-list .movie-item button {
-    padding: 8px 12px;
-    font-size: 0.9rem;
+  .time-list .time-btn {
+    padding: 10px 16px;
+    font-size: 0.85rem;
   }
 
   .movie-selection-list .movie-item {
-    min-width: 120px;
+    min-width: 140px;
+    padding: 15px;
+  }
+
+  .movie-selection-list .movie-item button {
+    padding: 10px 18px;
+    font-size: 0.85rem;
+  }
+
+  .selection-details {
+    padding: 20px 15px;
+    border-radius: 15px;
   }
 }
