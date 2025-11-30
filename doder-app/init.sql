@@ -189,16 +189,16 @@ VALUES
   ('Zootopia 2', 'การผจญภัยครั้งใหม่ของจูดี้ ฮอปส์ และนิค ไวลด์ ในเมืองที่สัตว์ทุกชนิดอยู่ร่วมกัน', 100, ARRAY['Animation', 'Adventure', 'Comedy', 'Family'], 'อังกฤษ', 'ไทย', '/uploads/posters/zootopia_2.jpg', '2025-11-27', TRUE),
   ('The Gunman', 'นักฆ่ามืออาชีพที่ต้องหนีไล่ล่าจากองค์กรลับ พร้อมเปิดเผยความจริงที่ถูกปิดบัง', 118, ARRAY['Action', 'Thriller'], 'อังกฤษ', 'ไทย', '/uploads/posters/the_gunman.jpg', '2025-11-15', TRUE),
   ('4 เสือ (4 Tigers)', 'สี่เสือในจักรวาลขุนพันธ์ที่ต้องร่วมมือกันเพื่อปกป้องดินแดน เรื่องราวแอ็คชั่นสุดมันส์', 140, ARRAY['Action', 'Crime', 'Drama'], 'ไทย', NULL, '/uploads/posters/4_tigers.jpg', '2025-10-23', TRUE),
-  ('Dune: Part One', 'เจ้าชายหนุ่มต้องเดินทางไปยังดาวทะเลทรายที่อันตรายที่สุดเพื่อปกป้องอนาคตของครอบครัว', 155, ARRAY['Sci-Fi', 'Adventure'], 'อังกฤษ', 'ไทย', '/uploads/posters/Dune.jpg', '2021-10-22', TRUE),
+  ('Dune: Part One', 'เจ้าชายหนุ่มต้องเดินทางไปยังดาวทะเลทรายที่อันตรายที่สุดเพื่อปกป้องอนาคตของครอบครัว', 155, ARRAY['Sci-Fi', 'Adventure'], 'อังกฤษ', 'ไทย', '/uploads/posters/dune.jpg', '2021-10-22', TRUE),
   ('Oppenheimer', 'เรื่องราวของ เจ. โรเบิร์ต ออปเพนไฮเมอร์ ผู้นำโครงการแมนฮัตตันสร้างระเบิดปรมาณู', 180, ARRAY['Biography', 'Drama'], 'อังกฤษ', 'ไทย', '/uploads/posters/oppenheimer.jpg', '2023-07-21', TRUE),
-  ('Top Gun: Maverick', 'พีท มาเวอริค กลับมาฝึกนักบินรุ่นใหม่สำหรับภารกิจสุดเสี่ยง', 131, ARRAY['Action', 'Drama'], 'อังกฤษ', 'ไทย', '/uploads/posters/3.jpg', '2022-05-27', TRUE),
-  ('Everything Everywhere All at Once', 'หญิงนักทำบัญชีถูกดึงเข้าสู่การผจญภัยสุดบ้าคลั่งในมัลติเวิร์สเพื่อกอบกู้โลก', 139, ARRAY['Sci-Fi', 'Comedy', 'Action'], 'อังกฤษ', 'ไทย', '/uploads/posters/4.jpg', '2022-03-25', TRUE),
-  ('Extraction', 'ทหารรับจ้างต้องทำภารกิจอันตรายเพื่อช่วยบุตรชายของเจ้าพ่อค้ายาที่ถูกลักพาตัว', 117, ARRAY['Action', 'Thriller'], 'อังกฤษ', 'ไทย', '/uploads/posters/5.jpg', '2020-04-24', TRUE),
-  ('Godzilla Minus One', 'ญี่ปุ่นหลังสงครามต้องเผชิญหน้ากับภัยครั้งใหม่จากก็อดซิลลายักษ์', 124, ARRAY['Action', 'Sci-Fi'], 'ญี่ปุ่น', 'ไทย', '/uploads/posters/6.jpg', '2023-12-01', TRUE),
-  ('Black Panther: Wakanda Forever', 'วาคานด้าปกป้องประเทศจากภัยคุกคามใหม่หลังการจากไปของกษัตริย์', 161, ARRAY['Superhero', 'Action', 'Drama'], 'อังกฤษ', 'ไทย', '/uploads/posters/7.jpg', '2022-11-11', TRUE),
-  ('Parasite', 'ครอบครัวยากจนแทรกซึมเข้าไปในชีวิตของครอบครัวร่ำรวยจนเกิดเหตุไม่คาดฝัน', 132, ARRAY['Drama', 'Thriller'], 'เกาหลี', 'ไทย', '/uploads/posters/8.jpg', '2020-02-07', TRUE),
-  ('Cruella', 'เรื่องราวเบื้องหลังของวายร้ายสุดชิค ครูเอลลา เดอ วิล ในช่วงปี 1970 ณ ลอนดอน', 134, ARRAY['Comedy', 'Crime'], 'อังกฤษ', 'ไทย', '/uploads/posters/9.jpg', '2021-05-28', TRUE),
-  ('A Quiet Place Part II', 'ครอบครัวแอ๊บบอตต้องออกเดินทางเผชิญหน้ากับความน่าสะพรึงกลัวของโลกภายนอก', 97, ARRAY['Horror', 'Sci-Fi'], 'อังกฤษ', 'ไทย', '/uploads/posters/10.jpg', '2021-05-28', TRUE);
+  ('Top Gun: Maverick', 'พีท มาเวอริค กลับมาฝึกนักบินรุ่นใหม่สำหรับภารกิจสุดเสี่ยง', 131, ARRAY['Action', 'Drama'], 'อังกฤษ', 'ไทย', '/uploads/posters/top_gun.jpg', '2022-05-27', TRUE),
+  ('Everything Everywhere All at Once', 'หญิงนักทำบัญชีถูกดึงเข้าสู่การผจญภัยสุดบ้าคลั่งในมัลติเวิร์สเพื่อกอบกู้โลก', 139, ARRAY['Sci-Fi', 'Comedy', 'Action'], 'อังกฤษ', 'ไทย', '/uploads/posters/everything_everywhere_all_at_once.jpg', '2022-03-25', TRUE),
+  ('Extraction 2', 'ทหารรับจ้างต้องทำภารกิจอันตรายเพื่อช่วยบุตรชายของเจ้าพ่อค้ายาที่ถูกลักพาตัว', 117, ARRAY['Action', 'Thriller'], 'อังกฤษ', 'ไทย', '/uploads/posters/extraction_2.jpg', '2020-04-24', TRUE),
+  ('Godzilla Minus One', 'ญี่ปุ่นหลังสงครามต้องเผชิญหน้ากับภัยครั้งใหม่จากก็อดซิลลายักษ์', 124, ARRAY['Action', 'Sci-Fi'], 'ญี่ปุ่น', 'ไทย', '/uploads/posters/godzilla_minus_one.jpg', '2023-12-01', TRUE),
+  ('Black Panther: Wakanda Forever', 'วาคานด้าปกป้องประเทศจากภัยคุกคามใหม่หลังการจากไปของกษัตริย์', 161, ARRAY['Superhero', 'Action', 'Drama'], 'อังกฤษ', 'ไทย', '/uploads/posters/black_panther_wakanda_forever.jpg', '2022-11-11', TRUE),
+  ('Parasite', 'ครอบครัวยากจนแทรกซึมเข้าไปในชีวิตของครอบครัวร่ำรวยจนเกิดเหตุไม่คาดฝัน', 132, ARRAY['Drama', 'Thriller'], 'เกาหลี', 'ไทย', '/uploads/posters/parasite.jpg', '2020-02-07', TRUE),
+  ('Cruella', 'เรื่องราวเบื้องหลังของวายร้ายสุดชิค ครูเอลลา เดอ วิล ในช่วงปี 1970 ณ ลอนดอน', 134, ARRAY['Comedy', 'Crime'], 'อังกฤษ', 'ไทย', '/uploads/posters/cruella.jpg', '2021-05-28', TRUE),
+  ('A Quiet Place Part II', 'ครอบครัวแอ๊บบอตต้องออกเดินทางเผชิญหน้ากับความน่าสะพรึงกลัวของโลกภายนอก', 97, ARRAY['Horror', 'Sci-Fi'], 'อังกฤษ', 'ไทย', '/uploads/posters/a_quiet_place_part_2.jpg', '2021-05-28', TRUE);
 
 -- รอบฉาย
 INSERT INTO showtimes (movie_id, theater_id, show_date, show_time, end_time, price, available_seats, is_active)
@@ -276,11 +276,11 @@ VALUES
    '2025-12-04','17:00','19:19',180.00,150,TRUE),
 
   -- Extraction
-  ((SELECT movie_id FROM movies WHERE title = 'Extraction'),
+  ((SELECT movie_id FROM movies WHERE title = 'Extraction 2'),
    (SELECT theater_id FROM theaters WHERE theater_name='โรง 2' AND cinema_id=(SELECT cinema_id FROM cinemas WHERE address='Central Nakhon Pathom')),
    '2025-12-05','14:30','16:27',180.00,150,TRUE),
 
-  ((SELECT movie_id FROM movies WHERE title = 'Extraction'),
+  ((SELECT movie_id FROM movies WHERE title = 'Extraction 2'),
    (SELECT theater_id FROM theaters WHERE theater_name='โรง 1' AND cinema_id=(SELECT cinema_id FROM cinemas WHERE address='Lotus Nakhon Pathom')),
    '2025-12-05','21:00','22:57',180.00,150,TRUE),
 
